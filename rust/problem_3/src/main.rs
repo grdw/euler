@@ -1,10 +1,18 @@
 fn is_prime(number: i64) -> bool {
-    let end = (number as f64).sqrt().floor() as i64;
-    let vec: Vec<i64> = (2..end+1).collect();
+    if number < 2 {
+        return false
+    }
 
-    number > 1 && vec.iter().all(|i|
-        *i == number || number % i > 0
-    )
+    let mut is_prime: bool = true;
+    let end = (number as f64).sqrt().floor() as i64;
+
+    for i in 2..end+1 {
+        if number % i == 0 {
+            is_prime = false;
+            break
+        }
+    }
+    is_prime
 }
 
 fn prime_factor(number: i64) -> i64 {
