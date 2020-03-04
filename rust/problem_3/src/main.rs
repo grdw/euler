@@ -10,6 +10,7 @@ fn is_prime(number: i64) -> bool {
 fn prime_factor(number: i64) -> i64 {
     let mut highest_fac: i64 = 0;
     let mut factor: i64 = 2;
+    let end = (number as f64).sqrt().floor() as i64;
 
     loop {
         factor += 1;
@@ -22,7 +23,7 @@ fn prime_factor(number: i64) -> i64 {
             highest_fac = factor;
         }
 
-        if factor >= number {
+        if factor >= end {
             break
         }
     }
@@ -44,5 +45,5 @@ fn is_prime_tests() {
 #[test]
 fn prime_factors_test() {
     assert_eq!(prime_factor(13195), 29);
-    //assert_eq!(prime_factor(600851475143), 1);
+    assert_eq!(prime_factor(600851475143), 6857);
 }
