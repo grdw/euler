@@ -8,19 +8,25 @@ fn is_prime(number: i64) -> bool {
 }
 
 fn prime_factor(number: i64) -> i64 {
-    let mut factors = vec![];
-    let l = number as f64;
+    let mut highest_fac: i64 = 0;
+    let mut factor: i64 = 2;
 
-    for i in 2..number {
-        let k = i as f64;
-        let m = (l / k).floor() as i64;
+    loop {
+        factor += 1;
 
-        if is_prime(m) && number % m == 0 && ! factors.contains(&m) {
-            factors.push(m);
+        if !is_prime(factor) {
+            continue;
+        }
+
+        if number % factor == 0 && highest_fac < factor {
+            highest_fac = factor;
+        }
+
+        if factor >= number {
+            break
         }
     }
-
-    *factors.iter().max().unwrap_or(&-1)
+    highest_fac
 }
 
 #[test]
