@@ -75,5 +75,5 @@ fn find_triplet_test() {
     assert_eq!(find_triplet(12), (3, 4, 5));
     assert_eq!(find_triplet(24), (6, 8, 10));
     assert_eq!(find_triplet(176), (48, 55, 73));
-    //assert_eq!(find_triplet(1000), (200, 375, 425));
+    assert_eq!(find_triplet(1000), (200, 375, 425));
 }
