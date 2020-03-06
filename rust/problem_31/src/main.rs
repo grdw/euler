@@ -1,14 +1,4 @@
-// In the United Kingdom the currency is made up of pound (£) and pence (p). There are eight coins in general circulation:
-//
-//     1p, 2p, 5p, 10p, 20p, 50p, £1 (100p), and £2 (200p).
-//
-// It is possible to make £2 in the following way:
-//
-//     1×£1 + 1×50p + 2×20p + 1×5p + 1×2p + 3×1p
-//
-// How many different ways can £2 be made using any number of coins?
-
-fn rec_count(coin_counts: &mut Vec<i32>, valid_coins: &Vec<i32>, i: usize, value: i32) -> bool {
+fn rec_count(coin_counts: &mut Vec<u32>, valid_coins: &Vec<u32>, i: usize, value: u32) -> bool {
     let mut running = i <= (coin_counts.len() - 1);
 
     if running {
@@ -22,8 +12,8 @@ fn rec_count(coin_counts: &mut Vec<i32>, valid_coins: &Vec<i32>, i: usize, value
     running
 }
 
-fn coins_for(value: i32) -> i32 {
-    let mut possibilities: i32 = 0;
+fn coins_for(value: u32) -> u32 {
+    let mut possibilities: u32 = 0;
     let valid_coins = vec![
         1,   // 1p
         2,   // 2p
@@ -35,15 +25,15 @@ fn coins_for(value: i32) -> i32 {
         200  // 2P
     ];
 
-    let mut coin_counts: Vec<i32> = vec![0; valid_coins.len()];
+    let mut coin_counts: Vec<u32> = vec![0; valid_coins.len()];
     let mut running = true;
+    let mut total: u32;
 
     while running {
-        let total: i32 = coin_counts
+        total = coin_counts
             .iter()
             .enumerate()
-            .map(|(i, x)| valid_coins[i] * x)
-            .sum();
+            .fold(0u32, |sum, (i, count)| sum + (valid_coins[i] * count));
 
         if total == value {
             possibilities += 1;
@@ -62,5 +52,6 @@ fn build_up_of_coins_test() {
     assert_eq!(coins_for(4), 3); // There's N ways
     assert_eq!(coins_for(10), 11);
     assert_eq!(coins_for(13), 16);
-    assert_eq!(coins_for(200), 0);
+    assert_eq!(coins_for(99), 4366);
+    //assert_eq!(coins_for(200), 0); // TOO SLOW!
 }
