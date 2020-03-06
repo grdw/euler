@@ -1,3 +1,27 @@
+// In the United Kingdom the currency is made up of pound (£) and pence (p). There are eight coins in general circulation:
+//
+//     1p, 2p, 5p, 10p, 20p, 50p, £1 (100p), and £2 (200p).
+//
+// It is possible to make £2 in the following way:
+//
+//     1×£1 + 1×50p + 2×20p + 1×5p + 1×2p + 3×1p
+//
+// How many different ways can £2 be made using any number of coins?
+
+fn rec_count(coin_counts: &mut Vec<i32>, valid_coins: &Vec<i32>, i: usize, value: i32) -> bool {
+    let mut running = i <= (coin_counts.len() - 1);
+
+    if running {
+        coin_counts[i] += 1;
+
+        if coin_counts[i] >= (value / valid_coins[i]) + 1 {
+            coin_counts[i] = 0;
+            running = rec_count(coin_counts, valid_coins, i + 1, value);
+        }
+    }
+    running
+}
+
 fn coins_for(value: i32) -> i32 {
     let mut possibilities: i32 = 0;
     let valid_coins = vec![
@@ -12,56 +36,31 @@ fn coins_for(value: i32) -> i32 {
     ];
 
     let mut coin_counts: Vec<i32> = vec![0; valid_coins.len()];
-    let mut start = 0;
-    let mut cycle = 0;
+    let mut running = true;
 
-    loop {
-        coin_counts[start] += 1;
+    while running {
+        let total: i32 = coin_counts
+            .iter()
+            .enumerate()
+            .map(|(i, x)| valid_coins[i] * x)
+            .sum();
 
-        if start > 0 {
-            start -= 1;
+        if total == value {
+            possibilities += 1;
         }
-        //let total: i32 = coin_counts
-        //    .iter()
-        //    .enumerate()
-        //    .map(|(i, c)| valid_coins[i] * c)
-        //    .sum();
-        println!("{:?}", coin_counts);
 
-        if coin_counts[start] >= value {
-            coin_counts[start] = 0;
-            start += 1;
-        }
+        running = rec_count(&mut coin_counts, &valid_coins, 0, value);
     }
-    //    if valid_coins[start] <= value {
-    //        coin_counts[start] += 1;
 
-    //        for i in 0..start {
-    //            coin_counts[i] += 1;
-    //        }
-
-    //        //println!("{:?}, {}, {}, {}", coin_counts, total, start, value % total);
-
-    //        if total == value {
-    //            coin_counts[start] = 0; // Reset the counter
-    //            start += 1;
-    //        }
-
-    //        //// A handle bar just in case
-    //        //if total > value {
-    //        //    break;
-    //        //}
-    //    }
-    //}
     possibilities
 }
 
 #[test]
-fn build_up_of_coints_test() {
-    //assert_eq!(coins_for(1), 1); // There's only 1 coin
-    //assert_eq!(coins_for(2), 2); // There's 2 ways
-    assert_eq!(coins_for(47), 100); // There's N ways
-    //assert_eq!(coins_for(10), 8);
-    //assert_eq!(coins_for(13), 8);
-    //assert_eq!(coins_for(200), 0);
+fn build_up_of_coins_test() {
+    assert_eq!(coins_for(1), 1); // There's only 1 coin
+    assert_eq!(coins_for(2), 2); // There's 2 ways
+    assert_eq!(coins_for(4), 3); // There's N ways
+    assert_eq!(coins_for(10), 11);
+    assert_eq!(coins_for(13), 16);
+    assert_eq!(coins_for(200), 0);
 }
