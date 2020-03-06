@@ -1,19 +1,4 @@
-fn rec_count(coin_counts: &mut Vec<u32>, valid_coins: &Vec<u32>, i: usize, value: u32) -> bool {
-    let mut running = i <= (coin_counts.len() - 1);
-
-    if running {
-        coin_counts[i] += 1;
-
-        if coin_counts[i] >= (value / valid_coins[i]) + 1 {
-            coin_counts[i] = 0;
-            running = rec_count(coin_counts, valid_coins, i + 1, value);
-        }
-    }
-    running
-}
-
-fn coins_for(value: u32) -> u32 {
-    let mut possibilities: u32 = 0;
+fn coins_for(value: i32) -> i32 {
     let valid_coins = vec![
         1,   // 1p
         2,   // 2p
@@ -25,24 +10,18 @@ fn coins_for(value: u32) -> u32 {
         200  // 2P
     ];
 
-    let mut coin_counts: Vec<u32> = vec![0; valid_coins.len()];
-    let mut running = true;
-    let mut total: u32;
+    let mut c: Vec<i32> = vec![0; value as usize];
+    c.insert(0, 1);
 
-    while running {
-        total = coin_counts
-            .iter()
-            .enumerate()
-            .fold(0u32, |sum, (i, count)| sum + (valid_coins[i] * count));
+    let len: i32 = c.len() as i32;
 
-        if total == value {
-            possibilities += 1;
+    for coin in valid_coins {
+        for i in 0..(len-coin) {
+            c[(i + coin) as usize] += c[i as usize]
         }
-
-        running = rec_count(&mut coin_counts, &valid_coins, 0, value);
     }
 
-    possibilities
+    c[c.len() - 1]
 }
 
 #[test]
@@ -53,5 +32,5 @@ fn build_up_of_coins_test() {
     assert_eq!(coins_for(10), 11);
     assert_eq!(coins_for(13), 16);
     assert_eq!(coins_for(99), 4366);
-    //assert_eq!(coins_for(200), 0); // TOO SLOW!
+    assert_eq!(coins_for(200), 73682);
 }
