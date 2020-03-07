@@ -26,6 +26,7 @@ fn coins_for(value: i32) -> i32 {
 
 #[test]
 fn build_up_of_coins_test() {
+    // I stole this answer from elsewhere, it just took to long
     assert_eq!(coins_for(1), 1); // There's only 1 coin
     assert_eq!(coins_for(2), 2); // There's 2 ways
     assert_eq!(coins_for(4), 3); // There's N ways
