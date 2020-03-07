@@ -1,16 +1,16 @@
 fn is_palindrome(string: String) -> bool {
-    let len = string.len() - 1;
+    let len = string.len();
 
-    if len == 0 {
+    if len == 1 {
         return true
     }
 
-    let end = (len + 1) / 2;
+    let end = len / 2;
     let r: Vec<usize> = (0..end).collect();
 
     r.iter().all(|x| {
         let l = string.chars().nth(*x);
-        let r = string.chars().nth(len - *x);
+        let r = string.chars().nth(len - 1 - *x);
         l == r
     })
 }
