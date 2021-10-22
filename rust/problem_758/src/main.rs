@@ -46,62 +46,52 @@ fn pourings(
 
     let mut picked = false;
 
-    println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
-
-    let possible_moves = vec![
-        (l, s), (m, s),
-        (s, m), (l, m),
-        (m, l), (s, l)
-    ];
-
-    for (from, to) in possible_moves {
-
-    }
+    //println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
 
     // Does S have capacity for the contents of M or L
     if pourable(l, s) && !picked {
-        println!("L -> S");
+        //println!("L -> S");
         picked = true;
-        let (mut l1, mut s1) = pour(l, s);
+        let (l1, s1) = pour(l, s);
         l = l1;
         s = s1;
     }
 
     if pourable(m, s) && !picked {
-        println!("M -> S");
+        //println!("M -> S");
         picked = true;
-        let(mut m1, mut s1) = pour(m, s);
+        let(m1, s1) = pour(m, s);
         m = m1;
         s = s1;
     };
 
     if pourable(s, m) && !picked {
-        println!("S -> M");
+        //println!("S -> M");
         picked = true;
-        let(mut s1, mut m1) = pour(s, m);
+        let(s1, m1) = pour(s, m);
         s = s1;
         m = m1;
     };
 
     if pourable(l, m) && !picked{
-        println!("L -> M");
+        //println!("L -> M");
         picked = true;
-        let(mut l1, mut m1) = pour(l, m);
+        let(l1, m1) = pour(l, m);
         l = l1;
         m = m1;
     };
 
     if pourable(m, l) && !picked{
-        println!("M -> L");
+        //println!("M -> L");
         picked = true;
-        let(mut m1, mut l1) = pour(m, l);
+        let(m1, l1) = pour(m, l);
         m = m1;
         l = l1;
     };
 
     if pourable(s, l) && !picked {
-        println!("S -> L");
-        let(mut s1, mut l1) = pour(s, l);
+        //println!("S -> L");
+        let(s1, l1) = pour(s, l);
         s = s1;
         l = l1;
     };
@@ -116,7 +106,6 @@ fn pourings_for_1_liter() {
     let large_bucket = (8, 0);
 
     let x = pourings(small_bucket, medium_bucket, large_bucket, 0);
-    println!("{}", x);
     assert_eq!(x, 4);
 }
 
