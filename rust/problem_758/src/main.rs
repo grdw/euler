@@ -5,12 +5,12 @@ fn main() {
 // https://projecteuler.net/problem=758
 // Run with 'cargo test'
 
-fn pourable(l: (i32, i32), r: (i32, i32)) -> bool {
+fn pourable(l: &(i32, i32), r: &(i32, i32)) -> bool {
     l.1 > 1 && (r.0 - r.1) > 0
 }
 
 fn pour(mut l: (i32, i32), mut r: (i32, i32)) -> ((i32, i32), (i32, i32)) {
-    if !pourable(l, r) {
+    if !pourable(&l, &r) {
         panic!("illegal pour; left bucket empty or right bucket is full");
     }
 
@@ -49,7 +49,7 @@ fn pourings(
     //println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
 
     // Does S have capacity for the contents of M or L
-    if pourable(l, s) && !picked {
+    if pourable(&l, &s) && !picked {
         //println!("L -> S");
         picked = true;
         let (l1, s1) = pour(l, s);
@@ -57,7 +57,7 @@ fn pourings(
         s = s1;
     }
 
-    if pourable(m, s) && !picked {
+    if pourable(&m, &s) && !picked {
         //println!("M -> S");
         picked = true;
         let(m1, s1) = pour(m, s);
@@ -65,7 +65,7 @@ fn pourings(
         s = s1;
     };
 
-    if pourable(s, m) && !picked {
+    if pourable(&s, &m) && !picked {
         //println!("S -> M");
         picked = true;
         let(s1, m1) = pour(s, m);
@@ -73,7 +73,7 @@ fn pourings(
         m = m1;
     };
 
-    if pourable(l, m) && !picked{
+    if pourable(&l, &m) && !picked{
         //println!("L -> M");
         picked = true;
         let(l1, m1) = pour(l, m);
@@ -81,7 +81,7 @@ fn pourings(
         m = m1;
     };
 
-    if pourable(m, l) && !picked{
+    if pourable(&m, &l) && !picked{
         //println!("M -> L");
         picked = true;
         let(m1, l1) = pour(m, l);
@@ -89,7 +89,7 @@ fn pourings(
         l = l1;
     };
 
-    if pourable(s, l) && !picked {
+    if pourable(&s, &l) && !picked {
         //println!("S -> L");
         let(s1, l1) = pour(s, l);
         s = s1;
