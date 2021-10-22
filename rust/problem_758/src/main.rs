@@ -41,62 +41,42 @@ fn pourings(
     }
 
     // This is arbitrary for now
-    if tries > 100 {
+    if tries > 10 {
         panic!("OVERFLOW ----");
     }
 
     let mut picked = false;
 
-    //println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
+    println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
 
-    //let moves = vec![
-    //    (l, s),
-    //    (m, s)
-    //];
-
-    //for (from, to) in moves {
-    //    if pourable(from, to) && !picked {
-    //        picked = true;
-    //        pour(from, to);
-
-    //    }
-    //};
-
-    // Does S have capacity for the contents of M or L
     if pourable(l, s) && !picked {
-        //println!("L -> S");
         picked = true;
         pour(l, s);
     }
 
     if pourable(m, s) && !picked {
-        //println!("M -> S");
         picked = true;
         pour(m, s);
-    };
+    }
 
     if pourable(s, m) && !picked {
-        //println!("S -> M");
         picked = true;
         pour(s, m);
-    };
+    }
 
     if pourable(l, m) && !picked{
-        //println!("L -> M");
         picked = true;
         pour(l, m);
-    };
+    }
 
     if pourable(m, l) && !picked{
-        //println!("M -> L");
         picked = true;
         pour(m, l);
-    };
+    }
 
     if pourable(s, l) && !picked {
-        //println!("S -> L");
         pour(s, l);
-    };
+    }
 
     pourings(s, m, l, tries + 1)
 }
