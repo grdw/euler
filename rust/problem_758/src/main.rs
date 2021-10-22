@@ -9,7 +9,10 @@ fn pourable(l: &(i32, i32), r: &(i32, i32)) -> bool {
     l.1 > 1 && (r.0 - r.1) > 0
 }
 
-fn pour(mut l: (i32, i32), mut r: (i32, i32)) -> ((i32, i32), (i32, i32)) {
+fn pour(
+    l: &mut (i32, i32),
+    r: &mut (i32, i32)) -> ((i32, i32), (i32, i32)) {
+
     if !pourable(&l, &r) {
         panic!("illegal pour; left bucket empty or right bucket is full");
     }
@@ -24,7 +27,7 @@ fn pour(mut l: (i32, i32), mut r: (i32, i32)) -> ((i32, i32), (i32, i32)) {
         l.1 = 0;
     }
 
-    (l, r)
+    (*l, *r)
 }
 
 // The format of a bucket is (capacity, current liters of water)
@@ -52,7 +55,7 @@ fn pourings(
     if pourable(&l, &s) && !picked {
         //println!("L -> S");
         picked = true;
-        let (l1, s1) = pour(l, s);
+        let (l1, s1) = pour(&mut l, &mut s);
         l = l1;
         s = s1;
     }
@@ -60,7 +63,7 @@ fn pourings(
     if pourable(&m, &s) && !picked {
         //println!("M -> S");
         picked = true;
-        let(m1, s1) = pour(m, s);
+        let(m1, s1) = pour(&mut m, &mut s);
         m = m1;
         s = s1;
     };
@@ -68,7 +71,7 @@ fn pourings(
     if pourable(&s, &m) && !picked {
         //println!("S -> M");
         picked = true;
-        let(s1, m1) = pour(s, m);
+        let(s1, m1) = pour(&mut s, &mut m);
         s = s1;
         m = m1;
     };
@@ -76,7 +79,7 @@ fn pourings(
     if pourable(&l, &m) && !picked{
         //println!("L -> M");
         picked = true;
-        let(l1, m1) = pour(l, m);
+        let(l1, m1) = pour(&mut l, &mut m);
         l = l1;
         m = m1;
     };
@@ -84,14 +87,14 @@ fn pourings(
     if pourable(&m, &l) && !picked{
         //println!("M -> L");
         picked = true;
-        let(m1, l1) = pour(m, l);
+        let(m1, l1) = pour(&mut m, &mut l);
         m = m1;
         l = l1;
     };
 
     if pourable(&s, &l) && !picked {
         //println!("S -> L");
-        let(s1, l1) = pour(s, l);
+        let(s1, l1) = pour(&mut s, &mut l);
         s = s1;
         l = l1;
     };
@@ -111,9 +114,9 @@ fn pourings_for_1_liter() {
 
 #[test]
 fn test_pour_full() {
-    let small_bucket = (3, 3);
-    let medium_bucket = (5, 0);
-    let (l, r) = pour(small_bucket, medium_bucket);
+    let mut small_bucket = (3, 3);
+    let mut medium_bucket = (5, 0);
+    let (l, r) = pour(&mut small_bucket, &mut medium_bucket);
 
     assert_eq!(l.1, 0);
     assert_eq!(r.1, 3);
@@ -121,9 +124,9 @@ fn test_pour_full() {
 
 #[test]
 fn test_pour_half() {
-    let medium_bucket = (5, 5);
-    let small_bucket = (2, 0);
-    let (l, r) = pour(medium_bucket, small_bucket);
+    let mut medium_bucket = (5, 5);
+    let mut small_bucket = (2, 0);
+    let (l, r) = pour(&mut medium_bucket, &mut small_bucket);
 
     assert_eq!(l.1, 3);
     assert_eq!(r.1, 2);
@@ -131,9 +134,9 @@ fn test_pour_half() {
 
 #[test]
 fn test_pour_precise() {
-    let small_bucket = (3, 3);
-    let medium_bucket = (5, 3);
-    let (l, r) = pour(small_bucket, medium_bucket);
+    let mut small_bucket = (3, 3);
+    let mut medium_bucket = (5, 3);
+    let (l, r) = pour(&mut small_bucket, &mut medium_bucket);
 
     assert_eq!(l.1, 1);
     assert_eq!(r.1, 5);
@@ -141,9 +144,9 @@ fn test_pour_precise() {
 
 #[test]
 fn test_pour_half_part_two() {
-    let medium_bucket = (5, 5);
-    let small_bucket = (8, 3);
-    let (l, r) = pour(medium_bucket, small_bucket);
+    let mut medium_bucket = (5, 5);
+    let mut small_bucket = (8, 3);
+    let (l, r) = pour(&mut medium_bucket, &mut small_bucket);
 
     assert_eq!(l.1, 0);
     assert_eq!(r.1, 8);
@@ -151,9 +154,9 @@ fn test_pour_half_part_two() {
 
 #[test]
 fn test_pour_half_part_three() {
-    let medium_bucket = (8, 5);
-    let small_bucket = (3, 0);
-    let (l, r) = pour(medium_bucket, small_bucket);
+    let mut medium_bucket = (8, 5);
+    let mut small_bucket = (3, 0);
+    let (l, r) = pour(&mut medium_bucket, &mut small_bucket);
 
     assert_eq!(l.1, 2);
     assert_eq!(r.1, 3);
@@ -162,15 +165,15 @@ fn test_pour_half_part_three() {
 #[test]
 #[should_panic]
 fn test_pour_when_r_bucket_no_space() {
-    let small_bucket = (3, 3);
-    let medium_bucket = (5, 5);
-    pour(small_bucket, medium_bucket);
+    let mut small_bucket = (3, 3);
+    let mut medium_bucket = (5, 5);
+    pour(&mut small_bucket, &mut medium_bucket);
 }
 
 #[test]
 #[should_panic]
 fn test_pour_when_l_bucket_empty() {
-    let small_bucket = (3, 0);
-    let medium_bucket = (5, 3);
-    pour(small_bucket, medium_bucket);
+    let mut small_bucket = (3, 0);
+    let mut medium_bucket = (5, 3);
+    pour(&mut small_bucket, &mut medium_bucket);
 }
