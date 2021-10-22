@@ -30,9 +30,9 @@ fn pour(
 
 // The format of a bucket is (capacity, current liters of water)
 fn pourings(
-    mut s: (i32, i32),
-    mut m: (i32, i32),
-    mut l: (i32, i32),
+    s: &mut (i32, i32),
+    m: &mut (i32, i32),
+    l: &mut (i32, i32),
     tries: i32
 ) -> i32 {
 
@@ -49,40 +49,53 @@ fn pourings(
 
     //println!("{} {} {} | ({})", s.1, m.1, l.1, tries);
 
+    //let moves = vec![
+    //    (l, s),
+    //    (m, s)
+    //];
+
+    //for (from, to) in moves {
+    //    if pourable(from, to) && !picked {
+    //        picked = true;
+    //        pour(from, to);
+
+    //    }
+    //};
+
     // Does S have capacity for the contents of M or L
-    if pourable(&l, &s) && !picked {
+    if pourable(l, s) && !picked {
         //println!("L -> S");
         picked = true;
-        pour(&mut l, &mut s);
+        pour(l, s);
     }
 
-    if pourable(&m, &s) && !picked {
+    if pourable(m, s) && !picked {
         //println!("M -> S");
         picked = true;
-        pour(&mut m, &mut s);
+        pour(m, s);
     };
 
-    if pourable(&s, &m) && !picked {
+    if pourable(s, m) && !picked {
         //println!("S -> M");
         picked = true;
-        pour(&mut s, &mut m);
+        pour(s, m);
     };
 
-    if pourable(&l, &m) && !picked{
+    if pourable(l, m) && !picked{
         //println!("L -> M");
         picked = true;
-        pour(&mut l, &mut m);
+        pour(l, m);
     };
 
-    if pourable(&m, &l) && !picked{
+    if pourable(m, l) && !picked{
         //println!("M -> L");
         picked = true;
-        pour(&mut m, &mut l);
+        pour(m, l);
     };
 
-    if pourable(&s, &l) && !picked {
+    if pourable(s, l) && !picked {
         //println!("S -> L");
-        pour(&mut s, &mut l);
+        pour(s, l);
     };
 
     pourings(s, m, l, tries + 1)
@@ -90,11 +103,11 @@ fn pourings(
 
 #[test]
 fn pourings_for_1_liter() {
-    let small_bucket = (3, 3);
-    let medium_bucket = (5, 5);
-    let large_bucket = (8, 0);
+    let mut small_bucket = (3, 3);
+    let mut medium_bucket = (5, 5);
+    let mut large_bucket = (8, 0);
 
-    let x = pourings(small_bucket, medium_bucket, large_bucket, 0);
+    let x = pourings(&mut small_bucket, &mut medium_bucket, &mut large_bucket, 0);
     assert_eq!(x, 4);
 }
 
