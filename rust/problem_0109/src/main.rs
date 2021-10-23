@@ -19,7 +19,7 @@
 // For 2 there's 1 [D1]
 // For 3 there's 1 [D1, S1]
 
-const MAX_OUT: i16 = 170;
+const MAX_OUT: i16 = 99;
 
 fn generate_dartboard_values() -> Vec<(i16, i16)> {
     let mut dart_values: Vec<(i16, i16)> = vec![];
@@ -34,54 +34,55 @@ fn generate_dartboard_values() -> Vec<(i16, i16)> {
 }
 
 fn num_outs(score: i16) -> i32 {
-    println!("{}", score);
-
     // Basic counter:
     let mut n = 0;
 
     let dart_values = generate_dartboard_values();
 
+    // This solution goes in reverse
+    // So I throw the double first, then the second dart, then the third
+    // dart.
+    //
     // Throw 1:
     for (w1, s1) in &dart_values {
         let l = score - w1 * s1;
 
-        if l < 0 { continue };
+        // If the score drops below 0 or it's not a double, skip the cycle
+        if l < 0 || *w1 != 2 { continue };
 
-        if *w1 == 2 { // To make sure you only throw a double
-            if l == 0 {
+        // If it's finished after 1 throw, increase the counter and skip
+        if l == 0 {
+            n += 1;
+            continue;
+        }
+
+        // This is some black magic:
+        let mut states = vec![];
+
+        // Throw 2
+        for (w2, s2) in &dart_values {
+            let l2 = l - w2 * s2;
+
+            if l2 < 0 { continue };
+
+            if l2 == 0 {
                 n += 1;
                 continue;
             }
 
-            let mut states = vec![];
-            // Throw 2
-            for (w2, s2) in &dart_values {
-                let l2 = l - w2 * s2;
+            states.push((w2, s2));
 
-                if l2 < 0 { continue };
+            // Throw 3
+            for (w3, s3) in &dart_values {
+                let l3 = l2 - w3 * s3;
 
-                if l2 == 0 {
+                if l3 < 0 { continue };
+
+                // I HAVE NO IDEA WHY THIS WORKS AND I DON'T
+                // TRUST IT
+                if l3 == 0 && states.iter().any(|(wc, sc)| *wc == w3 && *sc == s3) {
                     n += 1;
                     continue;
-                }
-
-                states.push((w2, s2));
-
-                // Throw 3
-                for (w3, s3) in &dart_values {
-                    let l3 = l2 - w3 * s3;
-
-                    if l3 < 0 { continue };
-
-                    if l3 == 0 {
-                        // I HAVE NO IDEA WHY THIS WORKS AND I DON'T
-                        // TRUST IT
-                        if states.iter().any(|(wc, sc)| *wc == w3 && *sc == s3) {
-                            n += 1;
-                        }
-
-                        continue;
-                    }
                 }
             }
         }
@@ -106,7 +107,7 @@ fn main() {
 
 #[test]
 fn test_problem_109() {
-    assert_eq!(problem_109(), 42336)
+    assert_eq!(problem_109(), 38182)
 }
 
 #[test]
