@@ -1,6 +1,7 @@
 use std::fs::File;
 use std::io::{prelude::*, BufReader};
 
+// https://projecteuler.net/problem=89
 fn main() {
     println!("Hello, world!");
 }
@@ -70,11 +71,16 @@ fn roman_to_int64(roman: String) -> i64 {
 fn test_all_roman_numerals() {
     let file = File::open("src/p089_roman.txt").unwrap();
     let reader = BufReader::new(file);
+    let mut total_of_chars = 0;
 
     for line in reader.lines() {
         let roman = line.unwrap();
-        println!("{:?}", roman_to_int64(roman));
+
+        total_of_chars +=
+            roman.len() - int64_to_roman(roman_to_int64(roman)).len();
     }
+
+    assert_eq!(total_of_chars, 743);
 }
 
 #[test]
