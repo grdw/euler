@@ -3,7 +3,17 @@ use std::io::{prelude::*, BufReader};
 
 // https://projecteuler.net/problem=89
 fn main() {
-    println!("Hello, world!");
+    let file = File::open("src/p089_roman.txt").unwrap();
+    let reader = BufReader::new(file);
+    let mut total_of_chars = 0;
+
+    for line in reader.lines() {
+        let roman = line.unwrap();
+
+        total_of_chars +=
+            roman.len() - int64_to_roman(roman_to_int64(roman)).len();
+    }
+    println!("{}", total_of_chars);
 }
 
 fn int64_to_roman(i: i64) -> String {
