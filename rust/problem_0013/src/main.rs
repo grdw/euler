@@ -7,7 +7,7 @@ fn problem_13(v: Vec<&'static str>) -> u64 {
     let mut total: u64 = 0;
 
     // So the idea is to go over each sum in the list
-    // Than over each character in that sum.
+    // Then over each character in that sum.
     // Swap out the old number of <list> and add the value
     // you see to that index. Basically summing up vertically
     // if you will.
@@ -20,7 +20,7 @@ fn problem_13(v: Vec<&'static str>) -> u64 {
     }
 
     // This takes all the 50 values of <list> and tries
-    // to sum them the primary school way up to 12 digits (powers).
+    // to sum them, the primary school way, up to 12 digits (powers).
     for (i, l) in list.iter().enumerate() {
         let n = 12 - i; // + the last 3 digits
         if n < 2 { break }
