@@ -8,29 +8,24 @@ fn problem_501(n: u64) -> u64 {
     let mut t = 0;
     let mut pset = Sieve::new();
 
-    // Memory problem:
-    //
-    // This vector is going to be enormous when doing this.
-    let primes: Vec<(usize, u64)> = pset
-        .iter()
-        .enumerate()
-        .take(n as usize)
-        .collect();
-
     // When three unique primes
-    for (_, p) in &primes {
-        if *p > n { break }
+    for p in pset.iter() {
+        if p > n { break }
 
-        for (_, p2) in &primes {
+        let mut pset = Sieve::new();
+
+        for p2 in pset.iter() {
             let o = p * p2;
 
-            if *p2 > n || o > n { break }
+            if p2 > n || o > n { break }
             if p >= p2 { continue }
 
-            for (_, p3) in &primes {
+            let mut pset = Sieve::new();
+
+            for p3 in pset.iter() {
                 let o = o * p3;
 
-                if *p3 > n || o > n { break }
+                if p3 > n || o > n { break }
                 if p2 >= p3 || p >= p3 { continue }
 
                 t += 1;
@@ -39,15 +34,17 @@ fn problem_501(n: u64) -> u64 {
     }
 
     // When one prime to the power of 3 with one other prime
-    for (_, p) in &primes {
+    for p in pset.iter() {
         let o = p.pow(3);
 
-        if *p > n || o > n { break }
+        if p > n || o > n { break }
 
-        for (_, p2) in &primes {
+        let mut pset = Sieve::new();
+
+        for p2 in pset.iter() {
             let o = o * p2;
 
-            if *p2 > n || o > n { break }
+            if p2 > n || o > n { break }
             if p == p2 { continue }
 
             t += 1
@@ -55,7 +52,7 @@ fn problem_501(n: u64) -> u64 {
     }
 
     // When one other prime is the power of 7
-    for (_, p) in &primes {
+    for p in pset.iter() {
         let o = p.pow(7);
 
         if o > n { break }
