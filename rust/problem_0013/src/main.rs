@@ -19,21 +19,26 @@ fn problem_13(v: Vec<&'static str>) -> u64 {
         }
     }
 
+    let f = 11;
     // This takes all the 50 values of <list> and tries
     // to sum them, the primary school way, up to 12 digits (powers).
-    for (i, l) in list.iter().enumerate() {
-        let n = 12 - i; // + the last 3 digits
-        if n < 2 { break }
-
+    // So the way you sum is like:
+    //
+    // 506 00 000 000 000 + 11 0's
+    //  428 0 000 000 000 + 10 0's
+    //   443  000 000 000 +  9 0's etc.
+    //
+    // You only need 8 of these to make a 10 digit number
+    // but considering all values are 3 digits long we need
+    // 8 + 3 = 11 numbers.
+    for (i, l) in list.iter().take(f).enumerate() {
+        let n = f - i; // + the last 3 digits
         let pow = 10_u64.pow(n as u32) as u64;
         total += *l * pow;
     }
 
-    // This last bit is just to snip off the last bits
-    // at the end because the full number is 12 bits longs.
-    let t = format!("{}", total);
-    total = t[0..10].parse().unwrap();
-    total
+    // The total number is 5 digits too long
+    total / 10_000
 }
 
 #[test]
