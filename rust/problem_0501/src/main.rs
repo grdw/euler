@@ -9,30 +9,23 @@ fn problem_501(n: u64) -> u64 {
     let mut pset = Sieve::new();
 
     // When three unique primes
-    'outer: for p in pset.iter() {
-        if p > n { break }
+    for p in pset.iter() {
+        if p > 2 { break }
 
         let mut pset = Sieve::new();
 
         for p2 in pset.iter() {
-            if p2 > n { break }
+            if p2 > 5 { break }
             if p >= p2 { continue }
 
             let mut pset = Sieve::new();
 
             for p3 in pset.iter() {
-                if p3 > n { break }
+                if p3 > 13 { break }
                 if p2 >= p3 || p >= p3 { continue }
 
-                let o = p * p2 * p3;
-
-                if o < n {
+                if p * p2 * p3 < n {
                     t += 1;
-                }
-
-                println!("{} x {} x {} = {}", p, p2, p3, o);
-                if o > n {
-                    break 'outer;
                 }
             }
         }
@@ -40,26 +33,28 @@ fn problem_501(n: u64) -> u64 {
 
     // When one prime to the power of 3 with one other prime
     for p in pset.iter() {
-        if p > n { break }
+        let o = p.pow(3);
+
+        if p > n || o > n { break }
 
         let mut pset = Sieve::new();
+
         for p2 in pset.iter() {
-            if p2 > n { break }
+            let o = o * p2;
+
+            if p2 > n || o > n { break }
             if p == p2 { continue }
 
-            if p.pow(3) * p2 < n {
-                t += 1;
-            }
+            t += 1
         }
     }
 
     // When one other prime is the power of 7
     for p in pset.iter() {
-        if p.pow(7) > n { break };
+        let o = p.pow(7);
 
-        if p.pow(7) < n {
-            t += 1;
-        }
+        if o > n { break }
+        if o < n { t += 1 }
     }
 
 
