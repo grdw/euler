@@ -4,25 +4,25 @@ fn main() {
     println!("Hello, world!");
 }
 
+// In theory this is how it should work but it's is just
+// too frickin slow in Rust...
+// Either I implement my own Sieve (Ehhh. bye) or I can
+// steal some other users library..
 fn problem_501(n: u64) -> u64 {
     let mut t = 0;
     let mut pset = Sieve::new();
 
     // When three unique primes
-    for p in pset.iter() {
+    for p in pset.clone().iter() {
         if p > n { break }
 
-        let mut pset = Sieve::new();
-
-        for p2 in pset.iter() {
+        for p2 in pset.clone().iter() {
             let o = p * p2;
 
             if p2 > n || o > n { break }
             if p >= p2 { continue }
 
-            let mut pset = Sieve::new();
-
-            for p3 in pset.iter() {
+            for p3 in pset.clone().iter() {
                 let o = o * p3;
 
                 if p3 > n || o > n { break }
@@ -34,14 +34,12 @@ fn problem_501(n: u64) -> u64 {
     }
 
     // When one prime to the power of 3 with one other prime
-    for p in pset.iter() {
+    for p in pset.clone().iter() {
         let o = p.pow(3);
 
         if p > n || o > n { break }
 
-        let mut pset = Sieve::new();
-
-        for p2 in pset.iter() {
+        for p2 in pset.clone().iter() {
             let o = o * p2;
 
             if p2 > n || o > n { break }
