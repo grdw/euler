@@ -3,7 +3,7 @@ fn main() {
 }
 
 fn problem_15(mut k: u128) -> u128 {
-    let mut n = k * 2;
+    let mut n = (k * 2) - 1;
     let mut o = 1;
     let mut p = 1;
 
@@ -14,7 +14,7 @@ fn problem_15(mut k: u128) -> u128 {
         k -= 1
     }
 
-    o / p
+    (o / p) * 2
 }
 
 
