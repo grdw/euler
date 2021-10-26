@@ -4,17 +4,20 @@ fn main() {
 
 use std::cmp;
 
-fn int_to_vec(mut i: u128) -> Vec<u8> {
-    let mut r = vec![];
-    let mut n: u32 = 1;
+const MAX_POWER: u32 = 100;
+
+fn int_to_vec(mut number: u128) -> Vec<u8> {
+    let mut result = vec![];
+    let mut tens: u128 = 10;
+
     while i > 0 {
-        let base = 10_u128.pow(n);
-        let res = i % base;
-        r.push((res / (base / 10)) as u8);
-        n += 1;
-        i -= res;
+        let base = number % tens;
+        result.push((base / (tens / 10)) as u8);
+
+        tens *= 10;
+        number -= base;
     }
-    r
+    result
 }
 
 fn multiply(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
@@ -33,7 +36,6 @@ fn multiply(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
     result
 }
 
-// Takes two vectors and adds them to one another
 fn sum_arrays(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
     let len: usize = cmp::max(a.len(), b.len());
     let mut result = vec![0; len];
@@ -58,12 +60,11 @@ fn sum_arrays(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
 
 fn problem_16(power: u32) -> u16 {
     let mut result = vec![1];
-    let max_power = 100;
-    let mut cycles = power / max_power;
-    let rest = power % max_power;
+    let mut cycles = power / MAX_POWER;
+    let rest = power % MAX_POWER;
 
     while cycles > 0 {
-        result = multiply(result, int_to_vec(2_u128.pow(max_power)));
+        result = multiply(result, int_to_vec(2_u128.pow(MAX_POWER)));
         cycles -= 1
     }
 
