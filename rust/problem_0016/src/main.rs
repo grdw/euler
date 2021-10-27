@@ -105,7 +105,6 @@ fn test_multiply() {
     )
 }
 
-
 fn problem_16(power: u32) -> u16 {
     let mut result = vec![1];
     let cycles = power / MAX_POWER;
@@ -129,4 +128,3 @@ fn test_problem_16() {
     assert_eq!(problem_16(115), 164);
     assert_eq!(problem_16(1000), 1366);
 }
-
