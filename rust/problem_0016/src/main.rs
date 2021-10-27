@@ -25,49 +25,39 @@ fn test_int_to_vec() {
     assert_eq!(int_to_vec(128), vec![8, 2, 1])
 }
 
-fn sum_arrays(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
-    let mut divs = vec![];
-    let mut a_iter = a.iter();
-    let mut b_iter = b.iter();
-    let mut prev_mod = 0;
+fn sum_array(result: &mut Vec<u8>, total: Vec<u8>) {
+    let mut prev_div = 0;
 
-    loop {
-        let total = match (a_iter.next(), b_iter.next()) {
-            (Some(x), Some(y)) => *x + *y,
-            (Some(x), None) => *x,
-            (None, Some(y)) => *y,
-            (None, None) => break
-        };
-
-        let (div, modulo) = (total % 10, total / 10);
-        divs.push(div + prev_mod);
-        prev_mod = modulo;
+    if result.len() < total.len() {
+        result.resize(total.len(), 0);
     }
 
-    if prev_mod > 0 {
-        divs.push(prev_mod);
+    for (i, x) in result.iter_mut().enumerate() {
+        let subt = *x + total.get(i).unwrap_or(&0);
+        let (div, modulo) = (subt / 10, subt % 10);
+
+        *x = modulo + prev_div;
+        prev_div = div;
     }
 
-    divs
+    if prev_div > 0 {
+        result.push(prev_div);
+    }
 }
 
 #[test]
 fn test_summing_arrays() {
-    // 0 + 80 = 80
-    assert_eq!(sum_arrays(vec![], vec![0, 8]), vec![0, 8]);
-    // 120 + 80 = 200
-    assert_eq!(sum_arrays(vec![0, 2, 1], vec![0, 8]), vec![0, 0, 2]);
-    // 92 + 80 = 271
-    assert_eq!(sum_arrays(vec![2, 9], vec![0, 8]), vec![2, 7, 1]);
-}
+    let mut result = vec![];
+    sum_array(&mut result, vec![0, 8]);
+    assert_eq!(result, vec![0, 8]);
 
-#[test]
-fn test_summing_multiple_arrays() {
-    let mut start = vec![1, 1, 1];
-    start = sum_arrays(start, vec![1, 1, 2]);
-    start = sum_arrays(start, vec![1, 1, 2]);
+    let mut result2 = vec![0, 2, 1];
+    sum_array(&mut result2, vec![0, 8]);
+    assert_eq!(result2, vec![0, 0, 2]);
 
-    assert_eq!(start, vec![3, 3, 5]);
+    let mut result3 = vec![2, 9];
+    sum_array(&mut result3, vec![0, 8]);
+    assert_eq!(result3, vec![2, 7, 1])
 }
 
 fn multiply(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
@@ -77,9 +67,9 @@ fn multiply(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
         for (j, y) in b.iter().enumerate() {
             let mut total = vec![0; i + j];
             let mut mul_vec = int_to_vec((x * y) as u128);
-
             total.append(&mut mul_vec);
-            result = sum_arrays(result, total);
+
+            sum_array(&mut result, total)
         }
     }
 
@@ -89,37 +79,37 @@ fn multiply(a: Vec<u8>, b: Vec<u8>) -> Vec<u8> {
 #[test]
 fn test_multiply() {
     assert_eq!(
-        multiply(
-            int_to_vec(16),
-            int_to_vec(28)
-        ),
+        multiply(int_to_vec(16), int_to_vec(28)),
         vec![8, 4, 4]
     );
 
     assert_eq!(
-        multiply(
-            int_to_vec(28000),
-            int_to_vec(1)
-        ),
+        multiply(int_to_vec(5), int_to_vec(6)),
+        vec![0, 3]
+    );
+
+    assert_eq!(
+        multiply(int_to_vec(28000), int_to_vec(1)),
         vec![0, 0, 0, 8, 2]
     )
 }
 
 fn problem_16(power: u32) -> u16 {
+    let (cycles, rest) = (power / MAX_POWER, power % MAX_POWER);
     let mut result = vec![1];
-    let cycles = power / MAX_POWER;
     let mut powers = vec![MAX_POWER; cycles as usize];
-    let rest = power % MAX_POWER;
 
     if rest > 0 {
         powers.push(rest);
     }
 
     for p in &powers {
-        result = multiply(result, int_to_vec(2_u128.pow(*p)));
+        let parr = int_to_vec(2_u128.pow(*p));
+
+        result = multiply(result, parr);
     }
 
-    result.iter().fold(0, |t, x| t + *x as u16)
+    result.iter().map(|&n| n as u16).sum()
 }
 
 #[test]
