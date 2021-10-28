@@ -2,41 +2,25 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn problem_18(mut t: Vec<Vec<u32>>) -> u32 {
-    let last = t.pop().unwrap();
-    let nmax = last.iter().enumerate().max_by_key(|(i, val)| *val).unwrap();
-    let mut offset = nmax.0;
-    let mut result = *nmax.1;
+fn problem_18(mut triangle: Vec<Vec<u32>>) -> u32 {
+    let mut inbetween = triangle.pop().unwrap();
 
-    for sub_t in t.iter().rev() {
-        let mut max = 0;
+    for layer in triangle.iter_mut().rev() {
+        for (index, value) in layer.iter_mut().enumerate() {
+            let x1 = inbetween.get(index).unwrap();
+            let x2 = inbetween.get(index + 1).unwrap_or(&0);
 
-        println!("{}, {}", result, offset);
-        let max = match (sub_t.get(offset), sub_t.get(offset + 1)) {
-            (Some(x), Some(y)) => {
-                if x > y {
-                    x
-                } else {
-                    y
-                }
-            },
-            (Some(x), None) => {
-                offset -= 1;
-                x
-            },
-            (None, Some(y)) => y,
-            _ => panic!("out of bounds")
-        };
-        //for (i, val) in sub_t[offset..offset + 2].iter().enumerate() {
-        //    if max < *val {
-        //        max = *val;
-        //        offset += i;
-        //    }
-        //}
-        result += max
+            if *value + x1 > *value + x2 {
+                *value += x1
+            } else {
+                *value += x2
+            }
+        }
+
+        inbetween = layer.to_vec();
     }
 
-    result
+    triangle[0][0]
 }
 
 #[test]
