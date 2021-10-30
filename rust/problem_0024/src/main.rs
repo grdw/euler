@@ -2,22 +2,6 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn factorial(mut i: u64) -> u64 {
-    let mut total = 2;
-    while i > 2 {
-        total *= i;
-        i -= 1
-    }
-    total
-}
-
-#[test]
-fn test_factorial() {
-    assert_eq!(factorial(5), 120);
-    assert_eq!(factorial(4), 24);
-    assert_eq!(factorial(3), 6);
-}
-
 fn reverse(vec: &mut Vec<u8>, mut a: usize, mut b: usize) {
     while a < b {
         vec.swap(a, b);
