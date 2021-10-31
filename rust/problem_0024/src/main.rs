@@ -2,35 +2,50 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn reverse(vec: &mut Vec<u8>, mut a: usize, mut b: usize) {
-    while a < b {
-        vec.swap(a, b);
-        a += 1;
-        b -= 1;
-    }
-}
-
-fn ord_smith(vec: &mut Vec<u8>, s: usize, count: &mut u32, max: u32) {
-    if s == vec.len() - 1 {
-        *count += 1;
-        if *count == max {
-            println!("RESULT: {:?} {}", vec, count);
-        }
-        return
+fn next_perm(res: &mut Vec<u8>) {
+    let mut i = res.len() - 1;
+    while res[i - 1] >= res[i] {
+        i -= 1
     }
 
-    for i in 0..vec.len() - s {
-        if i > 0 {
-            reverse(vec, s + 1, vec.len() - 1);
-            vec.swap(s, s + i);
-        }
-        ord_smith(vec, s + 1, count, max);
+    let mut j = res.len();
+    while res[j - 1] <= res[i - 1] {
+        j -= 1;
+    }
+
+    res.swap(i - 1, j - 1);
+
+    i += 1;
+    j = res.len();
+
+    while i < j {
+        res.swap(i - 1, j - 1);
+        i += 1;
+        j -= 1;
     }
 }
 
 #[test]
-fn test_ord_smith() {
-    let mut count = 0;
+fn test_next_perm() {
+    let mut g = vec![0,1,2];
+    next_perm(&mut g);
+    assert_eq!(g, vec![0, 2, 1]);
+
+    let mut g = vec![0,1,2];
+    for _ in 0..2 {
+        next_perm(&mut g);
+    }
+    assert_eq!(g, vec![1, 0, 2]);
+
+    let mut g = vec![0,1,2];
+    for _ in 0..5 {
+        next_perm(&mut g);
+    }
+    assert_eq!(g, vec![2, 1, 0]);
+
     let mut group = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-    ord_smith(&mut group, 0, &mut count, 1000000);
+    for _ in 0..1_000_000-1 {
+        next_perm(&mut group);
+    }
+    assert_eq!(group, [2, 7, 8, 3, 9, 1, 5, 4, 6, 0])
 }
