@@ -12,34 +12,6 @@ fn is_triplet(x: i32, y: i32, z: i32) -> bool {
 fn find_triplet(total: i32) -> (i32, i32, i32) {
     let (mut x, mut y, mut z) = (1, 2, total - 3);
 
-    // THIS IS TOTALLY LAZY BUT IT WORKS
-    //'x: loop {
-    //    if x >= total { break }
-
-    //    loop {
-    //        if y >= total {
-    //            y = 1;
-    //            break
-    //        }
-
-    //        loop {
-    //            if z >= total {
-    //                z = 1;
-    //                break
-    //            }
-
-    //            if x + y + z == total && is_triplet(x, y, z) {
-    //                break 'x;
-    //            }
-
-    //            z += 1;
-    //        }
-    //        y += 1;
-    //    }
-    //    x += 1;
-    //}
-
-    // SOLUTION 2:
     'x: loop {
         while (z - y) > 1 {
             z -= 1;
