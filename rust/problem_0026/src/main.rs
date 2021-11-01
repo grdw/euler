@@ -2,7 +2,7 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn range_pattern_count(range: &Vec<u128>, m: u128) -> Option<u64> {
+fn range_pattern_count(range: &Vec<u32>, m: u32) -> Option<u32> {
     if range.len() == 0 {
         return None;
     }
@@ -32,7 +32,7 @@ fn test_range_pattern_count() {
     assert_eq!(range_pattern_count(&vec![1, 2, 3], 4), None);
 }
 
-fn cycle_count(n: u128, d: u128) -> u64 {
+fn cycle_count(n: u32, d: u32) -> u32 {
     let base = 10;
     let mut m = n;
     let mut range = vec![];
@@ -76,7 +76,7 @@ fn test_cycle_count_more_than_10() {
     assert_eq!(cycle_count(1, 60), 1);
 }
 
-fn problem_26() -> u128 {
+fn problem_26() -> u32 {
     let mut resulting_cycle_count = 0;
     let mut number = 0;
     for n in 1..1000 {
