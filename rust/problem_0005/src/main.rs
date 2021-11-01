@@ -14,5 +14,5 @@ fn problem_5() -> u64 {
 
 #[test]
 fn test_problem_5() {
-    assert_eq!(problem_5(), 0);
+    assert_eq!(problem_5(), 232792560);
 }
