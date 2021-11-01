@@ -1,3 +1,44 @@
+const SPOTS:i32 = 3;
+
+fn factor_points(grid: &Vec<Vec<i32>>,
+                 y: i32,
+                 x: i32,
+                 dir_y: i32,
+                 dir_x: i32) -> i32 {
+
+    let mut total = 1;
+    let temp = vec![];
+
+    for n in 0..=SPOTS {
+        let mut loop_y = y;
+        let mut loop_x = x;
+
+        loop_y += n * dir_y;
+        loop_x += n * dir_x;
+
+        let y_row = grid.get(loop_y as usize).unwrap_or(&temp);
+        let x_value = y_row.get(loop_x as usize).unwrap_or(&0);
+
+        total *= x_value;
+    }
+    total
+}
+
+#[test]
+fn test_factor_points() {
+    let diagonal_grid = vec![
+        vec![1, 1, 1, 1, 1],
+        vec![1, 10, 1, 1, 1],
+        vec![1, 1, 10, 1, 1],
+        vec![1, 1, 1, 5, 1],
+       	vec![1, 1, 1, 1, 25]
+    ];
+
+    assert_eq!(factor_points(&diagonal_grid, 0, 0, 1, 1), 500);
+    assert_eq!(factor_points(&diagonal_grid, 1, 1, 1, 1), 12500);
+    assert_eq!(factor_points(&diagonal_grid, 2, 2, 1, 1), 0);
+}
+
 fn max(num: i32, other_num: i32) -> i32 {
     if num > other_num {
         num
@@ -7,34 +48,20 @@ fn max(num: i32, other_num: i32) -> i32 {
 }
 
 fn max_product_for_grid(grid: Vec<Vec<i32>>) -> i32 {
-    let grid_size = grid.len();
-    let spots: usize = 3; // How far do I have to look?
+    let grid_size = grid.len() as i32;
+    let directions = vec![
+        (1, -1),  (1, 0),  (1, 1), // TL  T  TR
+        (0, -1),           (0, 1), // L      R
+        (-1, -1), (-1, 0), (-1, 1) // BL  B  BR
+    ];
+
     let mut highest_factor: i32 = 0;
 
     for y in 0..grid_size {
         for x in 0..grid_size {
-            let can_look_right: bool = (x + spots) < grid_size;
-            let can_look_down: bool = (y + spots) < grid_size;
-
-            if can_look_right && can_look_down {
-                highest_factor = max(
-                    grid[y][x] * grid[y + 1][x + 1] * grid[y + 2][x + 2],
-                    highest_factor
-                );
-            }
-
-            if can_look_right {
-                highest_factor = max(
-                    grid[y][x] * grid[y][x + 1] * grid[y][x + 2],
-                    highest_factor
-                );
-            }
-
-            if can_look_down {
-                highest_factor = max(
-                    grid[y][x] * grid[y + 1][x] * grid[y + 2][x],
-                    highest_factor
-                )
+            for (dy, dx) in &directions {
+                let factor = factor_points(&grid, y, x, *dy, *dx);
+                highest_factor = max(highest_factor, factor);
             }
         }
     }
@@ -48,12 +75,12 @@ fn greatest_product_small_grid() {
         vec![1, 1, 1, 1, 1],
         vec![1, 10, 1, 1, 1],
         vec![1, 1, 10, 1, 1],
-        vec![1, 1, 1, 1, 1],
-       	vec![1, 1, 1, 1, 1]
+        vec![1, 1, 1, 5, 1],
+       	vec![1, 1, 1, 1, 25]
     ];
 
     let horizontal_grid = vec![
-        vec![1, 10, 20, 1, 1],
+        vec![1, 10, 20, 1, 45],
         vec![1, 1, 1, 1, 1],
         vec![1, 1, 1, 1, 1],
         vec![1, 1, 1, 1, 1],
@@ -63,8 +90,8 @@ fn greatest_product_small_grid() {
     let vertical_grid = vec![
         vec![1, 10, 1, 1, 1],
         vec![1, 30, 1, 1, 1],
-        vec![1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1],
+        vec![1, 2, 1, 1, 1],
+        vec![1, 8, 1, 1, 1],
         vec![1, 1, 1, 1, 1]
     ];
 
@@ -72,16 +99,16 @@ fn greatest_product_small_grid() {
         vec![1, 1, 1, 1, 1, 1, 1],
         vec![1, 1, 1, 1, 1, 1, 1],
         vec![1, 1, 1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1, 1, 1],
+        vec![1, 1, 1, 30, 60, 40, 9],
         vec![1, 1, 1, 1, 20, 1, 1],
-        vec![1, 1, 1, 1, 1, 10, 1],
-        vec![1, 1, 1, 1, 1, 1, 1]
+        vec![1, 1, 1, 1, 40, 10, 1],
+        vec![1, 1, 1, 1, 50, 1, 51]
     ];
 
-    assert_eq!(max_product_for_grid(diagonal_grid), 100);
-    assert_eq!(max_product_for_grid(horizontal_grid), 200);
-    assert_eq!(max_product_for_grid(vertical_grid), 300);
-    assert_eq!(max_product_for_grid(random_grid), 200);
+    assert_eq!(max_product_for_grid(diagonal_grid), 12500);
+    assert_eq!(max_product_for_grid(horizontal_grid), 9000);
+    assert_eq!(max_product_for_grid(vertical_grid), 4800);
+    assert_eq!(max_product_for_grid(random_grid), 2400000);
 }
 
 #[test]
@@ -109,5 +136,5 @@ fn greatest_product_the_real_thing() {
       vec![01, 70, 54, 71, 83, 51, 54, 69, 16, 92, 33, 48, 61, 43, 52, 01, 89, 19, 67, 48]
     ];
 
-    assert_eq!(max_product_for_grid(grid), 776776);
+    assert_eq!(max_product_for_grid(grid), 70600674);
 }
