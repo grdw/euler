@@ -6,18 +6,16 @@ fn factor_points(grid: &Vec<Vec<i32>>,
                  dir_y: i32,
                  dir_x: i32) -> i32 {
 
-    let mut total = 1;
     let temp = vec![];
 
-    for n in 0..=SPOTS {
+    (0..=SPOTS).fold(1, |acc, n| {
         let y = y + n * dir_y;
         let x = x + n * dir_x;
         let y_row = grid.get(y as usize).unwrap_or(&temp);
         let x_value = y_row.get(x as usize).unwrap_or(&0);
 
-        total *= x_value;
-    }
-    total
+        acc * x_value
+    })
 }
 
 #[test]
