@@ -27,15 +27,24 @@ fn factor_points(grid: &Vec<Vec<i32>>,
 #[test]
 fn test_factor_points() {
     let diagonal_grid = vec![
-        vec![1, 1, 1, 1, 1],
-        vec![1, 10, 1, 1, 1],
-        vec![1, 1, 10, 1, 1],
-        vec![1, 1, 1, 5, 1],
-       	vec![1, 1, 1, 1, 25]
+        vec![1, 2, 3, 4, 5],
+        vec![2, 10, 1, 1, 1],
+        vec![3, 1, 10, 1, 1],
+        vec![4, 1, 1, 5, 1],
+        vec![5, 1, 1, 1, 25]
     ];
 
+    // Look L->R from 0,0
+    assert_eq!(factor_points(&diagonal_grid, 0, 0, 0, 1), 24);
+    // Look T->D from 1,0
+    assert_eq!(factor_points(&diagonal_grid, 1, 0, 1, 0), 120);
+    // Look T->D + L->R from 0,0
     assert_eq!(factor_points(&diagonal_grid, 0, 0, 1, 1), 500);
+    // Look T->D + L->R from 1,1
     assert_eq!(factor_points(&diagonal_grid, 1, 1, 1, 1), 12500);
+    // Look D->T + R->L from 4,4
+    assert_eq!(factor_points(&diagonal_grid, 4, 4, -1, -1), 12500);
+    // Look T->D + L->R from 2,2
     assert_eq!(factor_points(&diagonal_grid, 2, 2, 1, 1), 0);
 }
 
@@ -70,49 +79,7 @@ fn max_product_for_grid(grid: Vec<Vec<i32>>) -> i32 {
 }
 
 #[test]
-fn greatest_product_small_grid() {
-    let diagonal_grid = vec![
-        vec![1, 1, 1, 1, 1],
-        vec![1, 10, 1, 1, 1],
-        vec![1, 1, 10, 1, 1],
-        vec![1, 1, 1, 5, 1],
-       	vec![1, 1, 1, 1, 25]
-    ];
-
-    let horizontal_grid = vec![
-        vec![1, 10, 20, 1, 45],
-        vec![1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1]
-    ];
-
-    let vertical_grid = vec![
-        vec![1, 10, 1, 1, 1],
-        vec![1, 30, 1, 1, 1],
-        vec![1, 2, 1, 1, 1],
-        vec![1, 8, 1, 1, 1],
-        vec![1, 1, 1, 1, 1]
-    ];
-
-    let random_grid = vec![
-        vec![1, 1, 1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1, 1, 1],
-        vec![1, 1, 1, 1, 1, 1, 1],
-        vec![1, 1, 1, 30, 60, 40, 9],
-        vec![1, 1, 1, 1, 20, 1, 1],
-        vec![1, 1, 1, 1, 40, 10, 1],
-        vec![1, 1, 1, 1, 50, 1, 51]
-    ];
-
-    assert_eq!(max_product_for_grid(diagonal_grid), 12500);
-    assert_eq!(max_product_for_grid(horizontal_grid), 9000);
-    assert_eq!(max_product_for_grid(vertical_grid), 4800);
-    assert_eq!(max_product_for_grid(random_grid), 2400000);
-}
-
-#[test]
-fn greatest_product_the_real_thing() {
+fn test_problem_11() {
     let grid = vec![
       vec![08, 02, 22, 97, 38, 15, 00, 40, 00, 75, 04, 05, 07, 78, 52, 12, 50, 77, 91, 08],
       vec![49, 49, 99, 40, 17, 81, 18, 57, 60, 87, 17, 40, 98, 43, 69, 48, 04, 56, 62, 00],
