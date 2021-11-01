@@ -2,27 +2,34 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn range_pattern_count(range: &Vec<u128>, m: u128) -> u64 {
+fn range_pattern_count(range: &Vec<u128>, m: u128) -> Option<u64> {
     if range.len() == 0 {
-        return 0;
+        return None;
     }
 
-    if range[range.len() - 1] == m {
-        1
-    } else if range.contains(&m) {
-        range.len() as u64
-    } else {
-        0
+    let mut count = 0;
+    let mut iter = range.iter().rev();
+
+    loop {
+        count += 1;
+
+        let val = iter.next().unwrap_or(&0);
+        if *val == m {
+            break Some(count)
+        } else if *val == 0 {
+            break None
+        }
     }
 }
 
 #[test]
 fn test_range_pattern_count() {
-    assert_eq!(range_pattern_count(&vec![], 1), 0);
-    assert_eq!(range_pattern_count(&vec![1], 1), 1);
-    assert_eq!(range_pattern_count(&vec![5, 2], 2), 1);
-    assert_eq!(range_pattern_count(&vec![1, 2, 3], 1), 3);
-    assert_eq!(range_pattern_count(&vec![1, 2, 3], 4), 0);
+    assert_eq!(range_pattern_count(&vec![], 1), None);
+    assert_eq!(range_pattern_count(&vec![1], 1), Some(1));
+    assert_eq!(range_pattern_count(&vec![5, 2], 2), Some(1));
+    assert_eq!(range_pattern_count(&vec![5, 10, 1, 2], 2), Some(1));
+    assert_eq!(range_pattern_count(&vec![1, 2, 3], 1), Some(3));
+    assert_eq!(range_pattern_count(&vec![1, 2, 3], 4), None);
 }
 
 fn cycle_count(n: u128, d: u128) -> u64 {
@@ -37,8 +44,7 @@ fn cycle_count(n: u128, d: u128) -> u64 {
             break 0;
         }
 
-        let rpc = range_pattern_count(&range, m);
-        if rpc > 0 {
+        if let Some(rpc) = range_pattern_count(&range, m) {
             break rpc;
         }
 
