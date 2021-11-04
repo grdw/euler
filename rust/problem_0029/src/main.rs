@@ -60,7 +60,7 @@ fn problem_29(max: u16) -> u16 {
             let string = primes
                 .iter()
                 .map(|(n, len)| format!("{}|{}|", n, *len as u16 * b))
-                .collect::<String>();
+                .collect();
 
             totals.push(string)
         }
