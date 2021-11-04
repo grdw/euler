@@ -63,7 +63,6 @@ fn problem_29(max: u16) -> u16 {
             }
         }
     }
-    println!("{:?}", totals);
     totals.len() as u16
 }
 
