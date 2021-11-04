@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn next_perm(res: &mut Vec<u8>) {
     // Assume res = [0,2,1]
     let mut i = res.len() - 1; // this becomes 2

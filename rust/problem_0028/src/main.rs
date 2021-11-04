@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn count_spiral_grid(size: u64) -> u64 {
     let mut start = 1;
     let mut total = 0;

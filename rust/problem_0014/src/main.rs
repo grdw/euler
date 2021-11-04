@@ -1,7 +1,3 @@
-//fn main() {
-//    println!("Hello, world!");
-//}
-
 fn chain_length(mut n: u64) -> u64 {
     let mut count = 1;
     while n > 1 {

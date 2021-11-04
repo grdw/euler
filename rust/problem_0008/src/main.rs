@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn problem_8() -> u64 {
     let big_digit =
 "73167176531330624919225119674426574742355349194934\

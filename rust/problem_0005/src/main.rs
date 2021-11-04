@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn problem_5() -> u64 {
     let mut start = 20;
     loop {

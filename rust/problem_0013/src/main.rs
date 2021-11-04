@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn problem_13(v: Vec<&'static str>) -> u64 {
     let mut list: Vec<u64> = vec![0; v[0].len()];
     let mut total: u64 = 0;

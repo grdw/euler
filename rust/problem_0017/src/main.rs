@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn int_to_spoken_len(mut i: usize) -> usize {
     let mut spoken_lengths: Vec<usize> = vec![0; 1001];
     spoken_lengths[1] = "one".len();

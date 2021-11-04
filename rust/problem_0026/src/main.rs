@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn range_pattern_count(range: &Vec<u16>, m: u16) -> Option<u16> {
     if range.len() == 0 {
         return None;

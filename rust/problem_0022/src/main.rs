@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 use std::fs;
 
 fn alphabet_value(name: &str) -> u32 {

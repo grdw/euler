@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn problem_18(mut triangle: Vec<Vec<u32>>) -> u32 {
     let mut inbetween = triangle.pop().unwrap();
 

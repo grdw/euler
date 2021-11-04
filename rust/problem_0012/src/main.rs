@@ -1,8 +1,4 @@
 // https://projecteuler.net/problem=12
-fn main() {
-    println!("Hello, world!");
-}
-
 fn num_factors(n: i64) -> i64 {
     if n == 1 {
         return n;

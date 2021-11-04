@@ -1,6 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
 fn problem_6() -> u128 {
     let mut sum: u128 = 0;
     let mut n_sum: u128 = 0;

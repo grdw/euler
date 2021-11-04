@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 pub trait ToVector {
     fn to_vec(&self) -> Vec<u8>;
 }

@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn is_prime(number: u64) -> bool {
     if number < 2 {
         return false

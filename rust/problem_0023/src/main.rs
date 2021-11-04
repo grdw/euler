@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn sum_proper_divisors(i: u32) -> u32 {
     let sqrt = (i as f64).sqrt() as u32;
     let mut total_div = 1;

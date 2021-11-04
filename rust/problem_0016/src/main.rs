@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 const MAX_POWER: u32 = 100;
 
 fn int_to_vec(mut number: u128) -> Vec<u8> {

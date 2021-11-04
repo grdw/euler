@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, world!");
-}
-
 fn problem_19() -> u32 {
     let mut total_sundays = 0;
     let mut weekday = 1;

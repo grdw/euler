@@ -1,7 +1,3 @@
-fn main() {
-    println!("Hello, sworld!");
-}
-
 fn problem_15(mut k: u128) -> u128 {
     let mut n = (k * 2) - 1;
     let mut o = 1;
