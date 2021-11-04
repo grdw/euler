@@ -49,8 +49,9 @@ fn test_prime_factors() {
 fn problem_29(max: u16) -> u16 {
     let mut totals: Vec<String> = vec![];
     for a in 2..=max {
+        let primes = prime_factors(a as u8);
+
         for b in 2..=max {
-            let primes = prime_factors(a as u8);
             let mut string = String::from("");
 
             for i in 0..primes.len() {
