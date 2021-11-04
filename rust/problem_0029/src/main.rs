@@ -19,14 +19,18 @@ fn is_prime(number: u8) -> bool {
     is_prime
 }
 
-fn prime_factors(mut number: u8) -> Vec<u8> {
-    let mut factors: Vec<u8> = vec![];
+fn prime_factors(mut number: u8) -> Vec<(u8, u8)> {
+    let mut factors: Vec<(u8, u8)> = vec![];
     let mut factor: u8 = 2;
     let end = (number as f64).sqrt().floor() as u8;
 
     while number > 1 {
         if is_prime(factor) && number % factor == 0 {
-            factors.push(factor);
+            match factors.iter().position(|(a,_)| *a == factor) {
+                Some(index) => factors[index].1 += 1,
+                None => factors.push((factor, 1))
+            }
+
             number /= factor;
         } else {
             factor += 1;
@@ -37,33 +41,35 @@ fn prime_factors(mut number: u8) -> Vec<u8> {
 
 #[test]
 fn test_prime_factors() {
-    assert_eq!(prime_factors(2), vec![2]);
-    assert_eq!(prime_factors(3), vec![3]);
-    assert_eq!(prime_factors(4), vec![2, 2]);
-    assert_eq!(prime_factors(5), vec![5]);
-    assert_eq!(prime_factors(10), vec![2, 5]);
-    assert_eq!(prime_factors(99), vec![3, 3, 11]);
-    assert_eq!(prime_factors(100), vec![2, 2, 5, 5]);
+    assert_eq!(prime_factors(2), vec![(2, 1)]);
+    assert_eq!(prime_factors(3), vec![(3, 1)]);
+    assert_eq!(prime_factors(4), vec![(2, 2)]);
+    assert_eq!(prime_factors(5), vec![(5, 1)]);
+    assert_eq!(prime_factors(10), vec![(2, 1), (5, 1)]);
+    assert_eq!(prime_factors(99), vec![(3, 2), (11, 1)]);
+    assert_eq!(prime_factors(100), vec![(2, 2), (5, 2)]);
 }
 
 fn problem_29(max: u16) -> u16 {
     let mut totals: Vec<String> = vec![];
+
     for a in 2..=max {
         let primes = prime_factors(a as u8);
 
         for b in 2..=max {
             let mut string = String::from("");
 
-            for i in 0..primes.len() {
-                let sub_string = primes[i].to_string().repeat(b as usize);
-                string.push_str(&sub_string);
+            for (n, len) in &primes {
+                let t = format!("{}|{}|", n, *len as u16 * b);
+                string.push_str(&t);
             }
 
-            if !totals.contains(&string) {
-                totals.push(string);
-            }
+            totals.push(string)
         }
     }
+
+    totals.sort();
+    totals.dedup();
     totals.len() as u16
 }
 
