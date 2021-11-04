@@ -57,12 +57,10 @@ fn problem_29(max: u16) -> u16 {
         let primes = prime_factors(a as u8);
 
         for b in 2..=max {
-            let mut string = String::from("");
-
-            for (n, len) in &primes {
-                let t = format!("{}|{}|", n, *len as u16 * b);
-                string.push_str(&t);
-            }
+            let string = primes
+                .iter()
+                .map(|(n, len)| format!("{}|{}|", n, *len as u16 * b))
+                .collect::<String>();
 
             totals.push(string)
         }
