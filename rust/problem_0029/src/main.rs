@@ -18,7 +18,6 @@ fn is_prime(number: u8) -> bool {
 fn prime_factors(mut number: u8) -> Vec<(u8, u8)> {
     let mut factors: Vec<(u8, u8)> = vec![];
     let mut factor: u8 = 2;
-    let end = (number as f64).sqrt().floor() as u8;
 
     while number > 1 {
         if is_prime(factor) && number % factor == 0 {
