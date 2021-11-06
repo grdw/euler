@@ -37,21 +37,21 @@ fn test_common_divisors() {
 }
 
 fn problem_32() -> u64 {
-    let mut n = 98765;
-    let mut all_ns: Vec<u64> = vec![];
+    let mut n = 7853;
+    let mut all_products: Vec<u64> = vec![];
 
     while n > 0 {
         let d = divisors(n);
 
         if !d.is_empty() {
-            all_ns.push(n);
+            all_products.push(n);
         }
         n -= 1;
     }
 
-    all_ns.sort();
-    all_ns.dedup();
-    all_ns.iter().sum()
+    all_products.sort();
+    all_products.dedup();
+    all_products.iter().sum()
 }
 
 #[test]
