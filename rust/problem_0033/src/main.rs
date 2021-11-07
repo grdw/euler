@@ -1,3 +1,7 @@
+fn get_char(string: &String, pos: usize) -> char {
+    string.chars().nth(pos).unwrap()
+}
+
 fn cancelled_simplified(
     num: f64,
     den: f64,
@@ -6,19 +10,10 @@ fn cancelled_simplified(
 
     let full_s = format!("{}{}", num, den);
     let small_s = format!("{}{}", simple_num, simple_den);
-    let all_present = small_s.chars().all(|x| full_s.contains(x));
 
-    let mut index = 0;
-    for f in small_s.chars() {
-        let m = full_s.find(f);
-
-        if m.is_some() {
-            index += m.unwrap();
-        }
-    }
-
-    all_present && index == 3 &&
-        (full_s.chars().nth(1).unwrap() == full_s.chars().nth(2).unwrap())
+    get_char(&full_s, 1) == get_char(&full_s, 2) &&
+    get_char(&full_s, 0) == get_char(&small_s, 0) &&
+    get_char(&full_s, 3) == get_char(&small_s, 1)
 }
 
 #[test]
@@ -32,6 +27,7 @@ fn test_cancelled_simplified() {
     assert_eq!(cancelled_simplified(15.0, 50.0, 3.0, 10.0), false);
     assert_eq!(cancelled_simplified(24.0, 42.0, 4.0, 7.0), false);
     assert_eq!(cancelled_simplified(12.0, 24.0, 1.0, 2.0), false);
+    assert_eq!(cancelled_simplified(24.0, 32.0, 3.0, 4.0), false);
 }
 
 fn simplify_fraction(num: f64, den: f64) -> Vec<u16> {
@@ -89,4 +85,3 @@ fn problem_33() -> u16 {
 fn test_problem_33() {
     assert_eq!(problem_33(), 100);
 }
-
