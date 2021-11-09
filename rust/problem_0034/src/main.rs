@@ -36,18 +36,26 @@ fn test_fact() {
 
 fn problem_34() -> u128 {
     let mut total = 0;
-    let mut start = 3;
+    let mut start = 10;
     let facts: Vec<u128> = (0..=9).map(|n| fact(n)).collect();
 
-    while start < 40_586 {
-        let sum: u128 = start
-            .to_vec()
+    loop {
+        let digits = start.to_vec();
+        let sum: u128 = digits
             .iter()
             .map(|n| facts[*n as usize])
             .sum();
 
         if sum == start {
             total += start
+        }
+
+        // Knowing 9!*7 is the highest amount of digits to choose where
+        // the sum of its factorials will remain the 'length' of 7.
+        // Why not pick an upper bound where the first number has
+        // a length of 7?
+        if digits.len() == 7 && digits.len() == sum.to_vec().len() {
+            break
         }
 
         start += 1;
