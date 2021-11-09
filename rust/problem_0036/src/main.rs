@@ -1,31 +1,24 @@
 fn is_palindrome(string: String) -> bool {
-    let len = string.len();
+    let len = string.len() - 1;
+    let end = string.len() / 2;
 
-    if len == 1 {
-        return true
-    }
-
-    let end = len / 2;
-    let r: Vec<usize> = (0..end).collect();
-
-    r.iter().all(|x| {
-        let l = string.chars().nth(*x);
-        let r = string.chars().nth(len - 1 - *x);
-        l == r
-    })
+    string[0..end]
+        .chars()
+        .enumerate()
+        .all(|(i,n)| n == string.chars().nth(len - i).unwrap())
 }
 
 fn sum_palindrome_base2_10(digits: u32) -> u32 {
-    let mut sum_pal = 0;
-    for i in 0..digits {
+    (0..digits).fold(0, |acc, i| {
         let i_base10 = format!("{}", i);
         let i_base2 = format!("{:b}", i);
 
         if is_palindrome(i_base10) && is_palindrome(i_base2) {
-            sum_pal += i;
+            acc + i
+        } else {
+            acc
         }
-    }
-    sum_pal
+    })
 }
 
 #[test]
