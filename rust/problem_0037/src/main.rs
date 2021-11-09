@@ -37,6 +37,7 @@ fn is_truncatable_prime(number: i64) -> bool {
 }
 
 const MAX_TRUNCATABLES: i32 = 11;
+
 fn truncatable_primes() -> i64 {
     let mut sum = 0;
     let mut n = 0;
