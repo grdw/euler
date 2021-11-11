@@ -33,9 +33,6 @@ fn problem_39() -> u64 {
                 let p = a + b + c;
 
                 if p <= max {
-                    if p == max {
-                        println!("{}, {}, {}", a, b, c);
-                    }
                     triplets[p as usize] += 1;
                 }
             }
