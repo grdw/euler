@@ -28,11 +28,14 @@ fn problem_39() -> u64 {
     let mut max_f = 0;
 
     for a in 1..=max_r {
-        for b in 1..=max_r {
+        for b in a..=max_r {
             if let Some(c) = calculate_c(a, b) {
                 let p = a + b + c;
 
                 if p <= max {
+                    if p == max {
+                        println!("{}, {}, {}", a, b, c);
+                    }
                     triplets[p as usize] += 1;
                 }
             }
