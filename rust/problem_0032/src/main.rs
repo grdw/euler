@@ -37,7 +37,7 @@ fn test_common_divisors() {
 }
 
 fn problem_32() -> u64 {
-    let mut n = 7853;
+    let mut n = 9876;
     let mut all_products: Vec<u64> = vec![];
 
     while n > 0 {
