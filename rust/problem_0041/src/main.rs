@@ -15,20 +15,18 @@ fn is_prime(number: u64) -> bool {
     is_prime
 }
 
+fn vec_to_int(vec: &Vec<char>) -> u64 {
+    vec
+      .iter()
+      .collect::<String>()
+      .parse()
+      .unwrap()
+}
+
 fn highest_heap_prime(mut vector: Vec<char>) -> u64 {
     let mut max: u64 = 0;
     let mut result: Vec<usize> = vec![0; vector.len()];
     let mut i = 0;
-
-    let n: u64 = vector
-        .iter()
-        .collect::<String>()
-        .parse()
-        .unwrap();
-
-    if is_prime(n) {
-        max = n;
-    }
 
     while i < vector.len() {
         if result[i] < i {
@@ -38,12 +36,7 @@ fn highest_heap_prime(mut vector: Vec<char>) -> u64 {
                 vector.swap(result[i], i);
             }
 
-            let n: u64 = vector
-                .iter()
-                .collect::<String>()
-                .parse()
-                .unwrap();
-
+            let n: u64 = vec_to_int(&vector);
             if n > max && is_prime(n) {
                 max = n;
             }
