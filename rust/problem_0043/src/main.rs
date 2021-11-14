@@ -1,17 +1,3 @@
-fn divisible_by_prime(i: u64, p: u64) -> bool {
-    let sqrt = (i as f64).sqrt() as u64;
-    let mut has_divisor_p = false;
-
-    for n in 2..=sqrt {
-        if i % n == 0 && p == n {
-            has_divisor_p = true;
-            break;
-        }
-    }
-
-    has_divisor_p
-}
-
 fn is_divisible(digits: &Vec<char>) -> bool {
     let group_size = 2;
     let max = digits.len() - group_size;
@@ -26,7 +12,7 @@ fn is_divisible(digits: &Vec<char>) -> bool {
             .parse()
             .unwrap();
 
-        if !divisible_by_prime(n, primes[i - 1]) {
+        if n % primes[i - 1] != 0 {
             break false
         }
 
