@@ -35,7 +35,7 @@ fn test_is_divisible() {
     assert_eq!(is_divisible(&g3), false)
 }
 
-fn divisor_rules(digits: &Vec<char>) -> bool {
+fn fits_div_rule_2_and_5(digits: &Vec<char>) -> bool {
     let rule_two = digits[3].to_digit(10).unwrap();
     let rule_five = digits[5];
 
@@ -43,14 +43,14 @@ fn divisor_rules(digits: &Vec<char>) -> bool {
 }
 
 #[test]
-fn test_divisor_rules() {
+fn test_fits_div_rule_2_and_5() {
     let g1 = vec!['0','0','0','2','0','5','0','0','0','0'];
     let g2 = vec!['0','0','0','3','0','5','0','0','0','0'];
     let g3 = vec!['0','0','0','2','0','6','0','0','0','0'];
 
-    assert_eq!(divisor_rules(&g1), true);
-    assert_eq!(divisor_rules(&g2), false);
-    assert_eq!(divisor_rules(&g3), false)
+    assert_eq!(fits_div_rule_2_and_5(&g1), true);
+    assert_eq!(fits_div_rule_2_and_5(&g2), false);
+    assert_eq!(fits_div_rule_2_and_5(&g3), false)
 }
 
 fn problem_43() -> u64 {
@@ -70,7 +70,7 @@ fn problem_43() -> u64 {
                 digits.swap(result[i], i);
             }
 
-            if divisor_rules(&digits) && is_divisible(&digits) {
+            if fits_div_rule_2_and_5(&digits) && is_divisible(&digits) {
                 let n: u64 = digits
                     .iter()
                     .collect::<String>()
