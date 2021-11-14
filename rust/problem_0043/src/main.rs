@@ -1,14 +1,15 @@
-fn divisors(i: u64) -> Vec<u64> {
+fn divisible_by_prime(i: u64, p: u64) -> bool {
     let sqrt = (i as f64).sqrt() as u64;
-    let mut total_div = vec![];
+    let mut has_divisor_p = false;
 
     for n in 2..=sqrt {
-        if i % n == 0 {
-            total_div.push(n);
+        if i % n == 0 && p == n {
+            has_divisor_p = true;
+            break;
         }
     }
 
-    total_div
+    has_divisor_p
 }
 
 fn is_divisible(digits: &Vec<char>) -> bool {
@@ -25,7 +26,7 @@ fn is_divisible(digits: &Vec<char>) -> bool {
             .parse()
             .unwrap();
 
-        if !divisors(n).contains(&primes[i - 1]) {
+        if !divisible_by_prime(n, primes[i - 1]) {
             break false
         }
 
