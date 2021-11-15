@@ -17,19 +17,13 @@ fn is_prime(number: u64) -> bool {
 
 fn is_prime_and_square(n: u64, primes: &Vec<u64>) -> bool {
     let mut goldbachs_conjecture = false;
-    let mut squares = vec![];
-
-    for p in 1..=((n / 2) as f64).sqrt() as u64 {
-        squares.push(p.pow(2) * 2);
-    }
 
     'outer: for p in primes {
         let t = n - p;
+        let max = ((t / 2) as f64).sqrt() as u64;
 
-        for ds in &squares {
-            if t < *ds { continue };
-
-            if t - ds == 0 {
+        for n in 1..=max {
+            if t - (n.pow(2) * 2) == 0 {
                 goldbachs_conjecture = true;
                 break 'outer;
             }
