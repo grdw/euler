@@ -1,57 +1,44 @@
-fn prime_factors(mut number: u64) -> u64 {
-    let mut count = 0;
-    let mut factor: u64 = 2;
-    let mut prev_factor = 0;
+fn sieve_of_eras() -> Vec<u64> {
+    let n = 1_000_000;
+    let mut prime_factors = vec![0; n + 1];
 
-    while number > 1 {
-        if number % factor == 0 {
-            number /= factor;
-
-            if factor != prev_factor {
-                count += 1;
+    for i in 2..=n {
+        if prime_factors[i] == 0 {
+            let mut j = i;
+            while j <= n {
+                prime_factors[j] += 1;
+                j += i
             }
-
-            prev_factor = factor;
-        } else {
-            factor += 1;
         }
     }
-    count
-}
 
-#[test]
-fn test_prime_factors() {
-    assert_eq!(prime_factors(2), 1);
-    assert_eq!(prime_factors(210), 4);
-    assert_eq!(prime_factors(644), 3);
-    assert_eq!(prime_factors(134043), 4);
-    assert_eq!(prime_factors(134044), 4);
+    prime_factors
 }
 
 fn problem_47() -> u64 {
-    let mut start: u64 = 1;
-    let mut prev_len: u64 = 0;
     let mut count = 0;
+    let mut prev_count = 0;
+    let mut solution = 0;
+    let prime_factors = sieve_of_eras();
 
-    loop {
-        start += 1;
-
-        let pf = prime_factors(start);
-
-        if pf != prev_len {
-            count = 0
+    for (i, prime_count) in prime_factors.iter().enumerate() {
+        if *prime_count != prev_count {
+            count = 0;
         }
 
-        if pf == 4  {
-            count += 1
+        if *prime_count == 4 {
+            count += 1;
         }
 
         if count == 4 {
-            break start - count + 1
+            solution = i - 3;
+            break;
         }
 
-        prev_len = pf
+        prev_count = *prime_count;
     }
+
+    solution as u64
 }
 
 #[test]
