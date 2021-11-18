@@ -17,28 +17,18 @@ fn sieve_of_eras() -> Vec<u64> {
 
 fn problem_47() -> u64 {
     let mut count = 0;
-    let mut prev_count = 0;
-    let mut solution = 0;
     let prime_factors = sieve_of_eras();
+    let group_size = 4;
 
-    for (i, prime_count) in prime_factors.iter().enumerate() {
-        if *prime_count != prev_count {
-            count = 0;
+    loop {
+        let group = &prime_factors[count..count + group_size];
+
+        if group.iter().all(|&d| d == 4) {
+            break count as u64
         }
 
-        if *prime_count == 4 {
-            count += 1;
-        }
-
-        if count == 4 {
-            solution = i - 3;
-            break;
-        }
-
-        prev_count = *prime_count;
+        count += 1;
     }
-
-    solution as u64
 }
 
 #[test]
