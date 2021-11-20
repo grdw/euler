@@ -96,16 +96,18 @@ fn problem_49() -> Vec<u64> {
     let l = primes.len();
 
     for i in 0..l {
-        let pi_string = primes[i].to_string();
+        let pi = primes[i];
+        let pi_string = pi.to_string();
 
         for j in i+1..l {
-            let pj_string = primes[j].to_string();
+            let pj = primes[j];
+            let pj_string = pj.to_string();
 
             if primes[j] > 0 && strict_match(&pi_string, &pj_string) {
                 match groups.get_mut(i) {
-                    Some(v) => { v.push(primes[j]) },
+                    Some(v) => { v.push(pj) },
                     None => {
-                        let group = vec![primes[i], primes[j]];
+                        let group = vec![pi, pj];
                         primes[j] = 0;
                         groups.push(group);
                     }
