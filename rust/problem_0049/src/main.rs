@@ -105,7 +105,7 @@ fn problem_49() -> Vec<u64> {
 
             if primes[j] > 0 && strict_match(&pi_string, &pj_string) {
                 match groups.get_mut(i) {
-                    Some(v) => { v.push(pj) },
+                    Some(v) => v.push(pj),
                     None => {
                         let group = vec![pi, pj];
                         primes[j] = 0;
