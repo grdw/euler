@@ -67,12 +67,6 @@ fn test_even_gaps() {
 }
 
 
-fn four_digit_primes() -> Vec<u64> {
-    (1000..=9999)
-        .filter(|&n| is_prime(n))
-        .collect()
-}
-
 fn sort(string: &String) -> String {
     let mut chars: Vec<char> = string.chars().collect();
     chars.sort_by(|a, b| b.cmp(a));
@@ -89,10 +83,15 @@ fn test_strict_match() {
     assert_eq!(strict_match(&String::from("1013"), &String::from("1031")), true);
 }
 
-fn problem_49() -> Vec<u64> {
+fn four_digit_primes() -> Vec<u64> {
+    (1000..=9999)
+        .filter(|&n| is_prime(n))
+        .collect()
+}
+
+fn prime_groups() -> Vec<Vec<u64>> {
     let mut groups: Vec<Vec<u64>> = vec![];
     let mut primes = four_digit_primes();
-    let mut result = vec![];
     let l = primes.len();
 
     for i in 0..l {
@@ -116,6 +115,12 @@ fn problem_49() -> Vec<u64> {
         }
     }
 
+    groups
+}
+
+fn problem_49() -> Vec<u64> {
+    let mut groups = prime_groups();
+    let mut result = vec![];
     for g in &groups {
         if g.len() > 2 {
             let snake = gaps(&g);
