@@ -22,13 +22,11 @@ fn problem_52() -> u64 {
         let dx = to_digits(x);
 
         if (2..=6).all(|m| to_digits(x * m) == dx) {
-            break;
+            break x
         }
 
         x += 1
     }
-
-    x
 }
 
 #[test]
