@@ -1,4 +1,4 @@
-fn sieve_of_eras(n: usize) -> Vec<bool> {
+fn sieve_of_erato(n: usize) -> Vec<bool> {
     let mut primes = vec![true; n + 1];
     let max = (n as f64).sqrt() as usize;
 
@@ -16,8 +16,8 @@ fn sieve_of_eras(n: usize) -> Vec<bool> {
 }
 
 #[test]
-fn test_sieve_of_eras() {
-    let sieves = sieve_of_eras(20);
+fn test_sieve_of_erato() {
+    let sieves = sieve_of_erato(20);
     assert_eq!(sieves[2], true);
     assert_eq!(sieves[4], false);
 }
@@ -30,7 +30,7 @@ fn problem_50() -> u64 {
     let mut chain_length = 21;
     let mut max_prime = 0;
 
-    let sieve = sieve_of_eras(MAX_N);
+    let sieve = sieve_of_erato(MAX_N);
     let mut primes = vec![];
 
     for n in 2..sieve.len() {
