@@ -1,6 +1,10 @@
 use std::{fs, str};
 use std::collections::HashMap;
 
+const CARDS: [char; 13] = [
+    '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
+];
+
 #[derive(Debug)]
 struct PokerHand<'a>(Vec<&'a str>);
 
@@ -30,7 +34,7 @@ impl PokerHand<'_> {
     }
 
     pub fn is_royal_flush(&self) -> bool {
-        let check = vec!['T', 'J', 'Q', 'K', 'A'];
+        let check = &CARDS[8..13];
         let cards = &self.0;
         let suite = cards[0].chars().nth(1);
 
@@ -65,9 +69,6 @@ impl PokerHand<'_> {
 
     pub fn is_straight(&self) -> bool {
         let mut straight = true;
-        let check = vec![
-            '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
-        ];
         let cards = &self.0;
         let len = cards.len();
         let mut prev_position = None;
@@ -75,7 +76,7 @@ impl PokerHand<'_> {
         for i in 0..len {
             let card = cards[i];
             let value = card.chars().nth(0).unwrap();
-            let position = check.iter().position(|&v| v == value);
+            let position = CARDS.iter().position(|&v| v == value);
 
             if prev_position.is_some() {
                 let prev_val = prev_position.unwrap();
