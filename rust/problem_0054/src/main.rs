@@ -1,5 +1,4 @@
 use std::{fs, str};
-use std::collections::HashMap;
 
 const CARDS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'
@@ -161,39 +160,31 @@ impl PokerHand<'_> {
         )
     }
 
-    fn is_any_of_a_kind(&self, max: u8, n: u8, t: usize) -> Option<Vec<usize>> {
-        let mut count = 0;
-        let mut any_of_a_kind = None;
+    fn is_any_of_a_kind(&self,
+                        max: usize,
+                        instances: usize,
+                        t: usize) -> Option<Vec<usize>> {
+
         let mut keys = vec![t];
-        let mut map: HashMap<char, u8> = HashMap::new();
+        let mut vals: Vec<usize> = vec![0; CARDS.len() + 1];
         let cards = &self.0;
 
-        // Yeah and fuck you to
         for &c in cards {
-            let value = c.chars().nth(0).unwrap();
-            let counter = map.entry(value).or_insert(0);
-            *counter += 1
-        }
+            let value = CARDS.len() - card_value(c.chars().nth(0).unwrap());
+            vals[value] += 1;
 
-        let mut map_keys: Vec<char> = map.keys().cloned().collect();
-        map_keys.sort();
-        map_keys.reverse();
-
-        for key in map_keys {
-            let val = map.get(&key).unwrap();
-
-            if *val == max {
-                count += 1;
-                keys.push(CARDS.len() - card_value(key));
-
-                if count == n {
-                    any_of_a_kind = Some(keys);
-                    break
-                }
+            if vals[value] == max {
+                keys.push(value)
             }
         }
 
-        any_of_a_kind
+        vals.retain(|&m| m == max);
+
+        if vals.len() == instances {
+            Some(keys)
+        } else {
+            None
+        }
     }
 }
 
