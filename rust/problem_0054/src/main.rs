@@ -82,27 +82,26 @@ impl PokerHand<'_> {
     }
 
     pub fn is_straight(&self) -> bool {
-        let mut straight = true;
+        let mut straight = false;
         let cards = &self.0;
-        let len = cards.len();
-        let mut prev_position = None;
 
-        for i in 0..len {
-            let card = cards[i];
-            let value = card.chars().nth(0).unwrap();
-            let position = CARDS.iter().position(|&v| v == value);
+        let values: Vec<char> = cards
+            .iter()
+            .map(|c| c.chars().nth(0).unwrap())
+            .collect();
 
-            if prev_position.is_some() {
-                let prev_val = prev_position.unwrap();
-                let pos_val = position.unwrap();
+        let mut n = 0;
+        let max = CARDS.len() - 5;
 
-                if pos_val < prev_val && prev_val - pos_val > 1 {
-                    straight = false;
-                    break;
-                }
+        while max >= n {
+            let con_slice = &CARDS[n..n + 5];
+            if values == con_slice {
+                straight = true;
+                break;
             }
-            prev_position = position
+            n += 1;
         }
+
         straight
     }
 
@@ -164,9 +163,9 @@ fn test_poker_hand_royal_flush() {
 
 #[test]
 fn test_poker_hand_straight_flush() {
-    let sf_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KD"]);
-    let no_sf_hand_1 = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
-    let no_sf_hand_2 = PokerHand(vec!["8D", "TD", "JD", "QD", "KD"]);
+    let sf_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KD"]);
+    let no_sf_hand_1 = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
+    let no_sf_hand_2 = PokerHand::sorted(vec!["8D", "TD", "JD", "QD", "KD"]);
 
     assert_eq!(sf_hand.is_straight_flush(), true);
     assert_eq!(sf_hand.rank(), 8);
@@ -206,12 +205,14 @@ fn test_poker_hand_flush() {
 
 #[test]
 fn test_poker_hand_straight() {
-    let s_hand = PokerHand(vec!["1D", "2D", "3D", "4S", "5D"]);
-    let no_s_hand = PokerHand(vec!["7D", "TD", "JD", "QD", "KS"]);
+    let s_hand = PokerHand::sorted(vec!["2D", "3D", "4D", "5S", "6D"]);
+    let no_s_hand_1 = PokerHand::sorted(vec!["QD", "8C", "7C", "6C", "5D"]);
+    let no_s_hand_2 = PokerHand::sorted(vec!["7D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(s_hand.is_straight(), true);
     assert_eq!(s_hand.rank(), 4);
-    assert_eq!(no_s_hand.is_straight(), false);
+    assert_eq!(no_s_hand_1.is_straight(), false);
+    assert_eq!(no_s_hand_2.is_straight(), false);
 }
 
 #[test]
