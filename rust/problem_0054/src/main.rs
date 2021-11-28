@@ -6,22 +6,28 @@ const CARDS: [char; 13] = [
 ];
 
 #[derive(Debug)]
-struct PokerHand<'a>(Vec<&'a str>, usize);
+struct PokerHand<'a>(Vec<&'a str>);
 
-impl Iterator for PokerHand<'_> {
+struct PokerHandIter<'a> {
+    inner: &'a PokerHand<'a>,
+    index: usize
+}
+
+impl Iterator for PokerHandIter<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<usize> {
-        if self.1 >= self.0.len() {
+        if self.index >= self.inner.0.len() {
             None
         } else {
-            let card = self.0[self.1];
+            let card = self.inner.0[self.index];
             let value = CARDS
                 .iter()
                 .position(|&r| r == card.chars().nth(0).unwrap())
                 .unwrap();
 
-            Some(value)
+            self.index += 1;
+            Some(CARDS.len() - value)
         }
     }
 }
@@ -34,7 +40,14 @@ impl PokerHand<'_> {
                 .position(|&r| r == a.chars().nth(0).unwrap())
         );
 
-        PokerHand(cards, 0)
+        PokerHand(cards)
+    }
+
+    pub fn iter<'a>(&'a self) -> PokerHandIter<'a> {
+        PokerHandIter {
+            inner: self,
+            index: 0
+        }
     }
 
     pub fn rank(&self) -> u16 {
@@ -280,7 +293,20 @@ fn problem_54() -> u16 {
         if v1.rank() > v2.rank() {
             wins += 1
         } else if v1.rank() == v2.rank() {
-            println!("{:?} {:?}", v1, v2);
+            let mut v1_iter = v1.iter();
+            let mut v2_iter = v2.iter();
+
+            loop {
+                match (v1_iter.next(), v2_iter.next()) {
+                    (Some(p1), Some(p2)) => {
+                        if p1 > p2 {
+                            wins += 1;
+                            break;
+                        }
+                    },
+                    (_, _) => break
+                }
+            }
         }
     }
 
@@ -289,5 +315,5 @@ fn problem_54() -> u16 {
 
 #[test]
 fn test_problem_54() {
-    assert_eq!(problem_54(), 1);
+    assert_eq!(problem_54(), 491);
 }
