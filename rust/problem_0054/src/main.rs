@@ -1,4 +1,5 @@
 use std::{fs, str};
+use std::collections::HashMap;
 
 #[derive(Debug)]
 struct PokerHand<'a>(Vec<&'a str>);
@@ -9,7 +10,21 @@ impl PokerHand<'_> {
             9
         } else if self.is_straight_flush() {
             8
-        } else {
+        } else if self.is_four_of_a_kind() {
+            7
+        } else if self.is_full_house() {
+            6
+        } else if self.is_flush() {
+            5
+        } else if self.is_straight() {
+            4
+        } else if self.is_three_of_a_kind() {
+            3
+        } else if self.is_two_pairs() {
+            2
+        } else if self.is_one_pair() {
+            1
+        } else { // This is 'high card'
             0
         }
     }
@@ -28,23 +43,37 @@ impl PokerHand<'_> {
     }
 
     pub fn is_straight_flush(&self) -> bool {
-        let mut straight_flush = true;
+        self.is_straight() && self.is_flush()
+    }
+
+    pub fn is_four_of_a_kind(&self) -> bool {
+        self.is_any_of_a_kind(4, 1)
+    }
+
+    pub fn is_full_house(&self) -> bool {
+        self.is_three_of_a_kind() && self.is_one_pair()
+    }
+
+    pub fn is_flush(&self) -> bool {
+        let cards = &self.0;
+        let suite = cards[0].chars().nth(1);
+
+        cards
+            .iter()
+            .all(|x| x.chars().nth(1) == suite)
+    }
+
+    pub fn is_straight(&self) -> bool {
+        let mut straight = true;
         let check = vec![
             '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
         ];
         let cards = &self.0;
-        let suite = cards[0].chars().nth(1);
         let len = cards.len();
         let mut prev_position = None;
 
         for i in 0..len {
-            let mut card = cards[i];
-
-            if card.chars().nth(1) != suite {
-                straight_flush = false;
-                break
-            }
-
+            let card = cards[i];
             let value = card.chars().nth(0).unwrap();
             let position = check.iter().position(|&v| v == value);
 
@@ -52,14 +81,52 @@ impl PokerHand<'_> {
                 let prev_val = prev_position.unwrap();
                 let pos_val = position.unwrap();
 
-                if pos_val - prev_val > 1 {
-                    straight_flush = false;
+                if pos_val > prev_val && pos_val - prev_val > 1 {
+                    straight = false;
                     break;
                 }
             }
             prev_position = position
         }
-        straight_flush
+        straight
+    }
+
+    pub fn is_three_of_a_kind(&self) -> bool {
+        self.is_any_of_a_kind(3, 1)
+    }
+
+    pub fn is_two_pairs(&self) -> bool {
+        self.is_any_of_a_kind(2, 2)
+    }
+
+    pub fn is_one_pair(&self) -> bool {
+        self.is_any_of_a_kind(2, 1)
+    }
+
+    fn is_any_of_a_kind(&self, max: u8, n: u8) -> bool {
+        let mut any_of_a_kind = false;
+        let mut map: HashMap<char, u8> = HashMap::new();
+        let cards = &self.0;
+        let mut count = 0;
+
+        for &c in cards {
+            let value = c.chars().nth(0).unwrap();
+            let counter = map.entry(value).or_insert(0);
+            *counter += 1
+        }
+
+        for val in map.values() {
+            if *val == max {
+                count += 1;
+
+                if count == n {
+                    any_of_a_kind = true;
+                    break
+                }
+            }
+        }
+
+        any_of_a_kind
     }
 }
 
@@ -83,6 +150,56 @@ fn test_poker_hand_straight_flush() {
     assert_eq!(sf_hand.value(), 8);
     assert_eq!(no_sf_hand_1.is_straight_flush(), false);
     assert_eq!(no_sf_hand_2.is_straight_flush(), false);
+}
+
+#[test]
+fn test_poker_hand_four_of_a_kind() {
+    let foak_hand = PokerHand(vec!["9D", "5H", "5C", "5S", "5D"]);
+    let no_foak_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
+
+    assert_eq!(foak_hand.is_four_of_a_kind(), true);
+    assert_eq!(foak_hand.value(), 7);
+    assert_eq!(no_foak_hand.is_four_of_a_kind(), false);
+}
+
+#[test]
+fn test_poker_hand_full_house() {
+    let fh_hand = PokerHand(vec!["9D", "9H", "5C", "5S", "5D"]);
+    let no_fh_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
+
+    assert_eq!(fh_hand.is_full_house(), true);
+    assert_eq!(fh_hand.value(), 6);
+    assert_eq!(no_fh_hand.is_full_house(), false);
+}
+
+#[test]
+fn test_poker_hand_flush() {
+    let f_hand = PokerHand(vec!["9D", "2D", "3D", "KD", "QD"]);
+    let no_f_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
+
+    assert_eq!(f_hand.is_flush(), true);
+    assert_eq!(f_hand.value(), 5);
+    assert_eq!(no_f_hand.is_flush(), false);
+}
+
+#[test]
+fn test_poker_hand_straight() {
+    let s_hand = PokerHand(vec!["1D", "2D", "3D", "4S", "5D"]);
+    let no_s_hand = PokerHand(vec!["7D", "TD", "JD", "QD", "KS"]);
+
+    assert_eq!(s_hand.is_straight(), true);
+    assert_eq!(s_hand.value(), 4);
+    assert_eq!(no_s_hand.is_straight(), false);
+}
+
+#[test]
+fn test_poker_hand_two_pairs() {
+    let tp_hand = PokerHand(vec!["2S", "2D", "3D", "3S", "5D"]);
+    let no_tp_hand = PokerHand(vec!["7D", "TD", "JD", "QD", "KS"]);
+
+    assert_eq!(tp_hand.is_two_pairs(), true);
+    assert_eq!(tp_hand.value(), 2);
+    assert_eq!(no_tp_hand.is_two_pairs(), false);
 }
 
 fn hand_to_cards(hand: &str) -> PokerHand {
