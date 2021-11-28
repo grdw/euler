@@ -69,8 +69,6 @@ impl PokerHand<'_> {
     }
 
     pub fn rank(&mut self) -> u16 {
-        self.1.push(self.0[0].chars().nth(0).unwrap());
-
         if self.is_royal_flush() {
             9
         } else if self.is_straight_flush() {
