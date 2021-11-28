@@ -223,8 +223,7 @@ fn hand_to_cards(hand: &str) -> PokerHand {
 
 fn value_hand(hand: &str) -> u16 {
     let cards = hand_to_cards(hand);
-    println!("{:?}", cards);
-    0
+    cards.value()
 }
 
 #[test]
@@ -242,11 +241,13 @@ fn problem_54() -> u16 {
     games.remove(games.len() - 1);
 
     for game in &games {
-        let p1 = &game[0..14];
-        let p2 = &game[15..];
+        let v1 = value_hand(&game[0..14]);
+        let v2 = value_hand(&game[15..]);
 
-        if value_hand(p1) > value_hand(p2) {
+        if v1 > v2 {
             wins += 1
+        } else if v1 == v2 {
+            println!("{:?} {} {}", game, v1, v2);
         }
     }
 
