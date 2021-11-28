@@ -1,5 +1,6 @@
 use std::{fs, str};
 use std::collections::HashMap;
+use std::cmp::Ordering;
 
 const CARDS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'
@@ -18,6 +19,18 @@ struct PokerHand<'a>(Vec<&'a str>, Vec<char>);
 struct PokerHandIter<'a> {
     inner: &'a PokerHand<'a>,
     index: usize
+}
+
+impl PartialOrd for PokerHand<'_> {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        0.partial_cmp(&2)
+    }
+}
+
+impl PartialEq for PokerHand<'_> {
+    fn eq(&self, other: &Self) -> bool {
+        false
+    }
 }
 
 impl Iterator for PokerHandIter<'_> {
@@ -42,7 +55,10 @@ impl PokerHand<'_> {
             card_value(a.chars().nth(0).unwrap())
         );
 
-        PokerHand(cards, vec![])
+        let mut values = vec![];
+        values.push(cards[0].chars().nth(0).unwrap());
+
+        PokerHand(cards, values)
     }
 
     pub fn iter<'a>(&'a self) -> PokerHandIter<'a> {
@@ -192,6 +208,14 @@ fn test_poker_hand_royal_flush() {
     assert_eq!(rf_hand.is_royal_flush(), true);
     assert_eq!(no_rf_hand.is_royal_flush(), false);
     assert_eq!(rf_hand.rank(), 9);
+}
+
+#[test]
+fn test_poker_hand_royal_flush_high() {
+    let rf_hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AD"]);
+    let no_rf_hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AS"]);
+
+    assert_eq!(rf_hand > no_rf_hand, true);
 }
 
 #[test]
