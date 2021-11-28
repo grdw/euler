@@ -6,7 +6,7 @@ const CARDS: [char; 13] = [
 ];
 
 #[derive(Debug)]
-struct PokerHand<'a>(Vec<&'a str>);
+struct PokerHand<'a>(Vec<&'a str>, Vec<char>);
 
 struct PokerHandIter<'a> {
     inner: &'a PokerHand<'a>,
@@ -17,13 +17,13 @@ impl Iterator for PokerHandIter<'_> {
     type Item = usize;
 
     fn next(&mut self) -> Option<usize> {
-        if self.index >= self.inner.0.len() {
+        if self.index >= self.inner.1.len() {
             None
         } else {
-            let card = self.inner.0[self.index];
+            let card = self.inner.1[self.index];
             let value = CARDS
                 .iter()
-                .position(|&r| r == card.chars().nth(0).unwrap())
+                .position(|&r| r == card)
                 .unwrap();
 
             self.index += 1;
@@ -40,7 +40,7 @@ impl PokerHand<'_> {
                 .position(|&r| r == a.chars().nth(0).unwrap())
         );
 
-        PokerHand(cards)
+        PokerHand(cards, vec![])
     }
 
     pub fn iter<'a>(&'a self) -> PokerHandIter<'a> {
@@ -50,7 +50,9 @@ impl PokerHand<'_> {
         }
     }
 
-    pub fn rank(&self) -> u16 {
+    pub fn rank(&mut self) -> u16 {
+        self.1.push(self.0[0].chars().nth(0).unwrap());
+
         if self.is_royal_flush() {
             9
         } else if self.is_straight_flush() {
@@ -91,11 +93,11 @@ impl PokerHand<'_> {
         self.is_straight() && self.is_flush()
     }
 
-    pub fn is_four_of_a_kind(&self) -> bool {
+    pub fn is_four_of_a_kind(&mut self) -> bool {
         self.is_any_of_a_kind(4, 1)
     }
 
-    pub fn is_full_house(&self) -> bool {
+    pub fn is_full_house(&mut self) -> bool {
         self.is_three_of_a_kind() && self.is_one_pair()
     }
 
@@ -132,19 +134,19 @@ impl PokerHand<'_> {
         straight
     }
 
-    pub fn is_three_of_a_kind(&self) -> bool {
+    pub fn is_three_of_a_kind(&mut self) -> bool {
         self.is_any_of_a_kind(3, 1)
     }
 
-    pub fn is_two_pairs(&self) -> bool {
+    pub fn is_two_pairs(&mut self) -> bool {
         self.is_any_of_a_kind(2, 2)
     }
 
-    pub fn is_one_pair(&self) -> bool {
+    pub fn is_one_pair(&mut self) -> bool {
         self.is_any_of_a_kind(2, 1)
     }
 
-    fn is_any_of_a_kind(&self, max: u8, n: u8) -> bool {
+    fn is_any_of_a_kind(&mut self, max: u8, n: u8) -> bool {
         let mut count = 0;
         let mut any_of_a_kind = false;
         let mut map: HashMap<char, u8> = HashMap::new();
@@ -156,11 +158,13 @@ impl PokerHand<'_> {
             *counter += 1
         }
 
-        for val in map.values() {
-            if *val == max {
+        for (key, val) in map {
+            if val == max {
                 count += 1;
 
                 if count == n {
+                    self.1.insert(0, key);
+
                     any_of_a_kind = true;
                     break
                 }
@@ -180,7 +184,7 @@ fn test_poker_hand_sorted() {
 
 #[test]
 fn test_poker_hand_royal_flush() {
-    let rf_hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AD"]);
+    let mut rf_hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AD"]);
     let no_rf_hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AS"]);
 
     assert_eq!(rf_hand.is_royal_flush(), true);
@@ -190,7 +194,7 @@ fn test_poker_hand_royal_flush() {
 
 #[test]
 fn test_poker_hand_straight_flush() {
-    let sf_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KD"]);
+    let mut sf_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KD"]);
     let no_sf_hand_1 = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
     let no_sf_hand_2 = PokerHand::sorted(vec!["8D", "TD", "JD", "QD", "KD"]);
 
@@ -202,8 +206,8 @@ fn test_poker_hand_straight_flush() {
 
 #[test]
 fn test_poker_hand_four_of_a_kind() {
-    let foak_hand = PokerHand::sorted(vec!["9D", "5H", "5C", "5S", "5D"]);
-    let no_foak_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
+    let mut foak_hand = PokerHand::sorted(vec!["9D", "5H", "5C", "5S", "5D"]);
+    let mut no_foak_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(foak_hand.is_four_of_a_kind(), true);
     assert_eq!(foak_hand.rank(), 7);
@@ -212,8 +216,8 @@ fn test_poker_hand_four_of_a_kind() {
 
 #[test]
 fn test_poker_hand_full_house() {
-    let fh_hand = PokerHand::sorted(vec!["9D", "9H", "5C", "5S", "5D"]);
-    let no_fh_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
+    let mut fh_hand = PokerHand::sorted(vec!["9D", "9H", "5C", "5S", "5D"]);
+    let mut no_fh_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(fh_hand.is_full_house(), true);
     assert_eq!(fh_hand.rank(), 6);
@@ -222,7 +226,7 @@ fn test_poker_hand_full_house() {
 
 #[test]
 fn test_poker_hand_flush() {
-    let f_hand = PokerHand::sorted(vec!["9D", "2D", "3D", "KD", "QD"]);
+    let mut f_hand = PokerHand::sorted(vec!["9D", "2D", "3D", "KD", "QD"]);
     let no_f_hand = PokerHand::sorted(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(f_hand.is_flush(), true);
@@ -232,7 +236,7 @@ fn test_poker_hand_flush() {
 
 #[test]
 fn test_poker_hand_straight() {
-    let s_hand = PokerHand::sorted(vec!["2D", "3D", "4D", "5S", "6D"]);
+    let mut s_hand = PokerHand::sorted(vec!["2D", "3D", "4D", "5S", "6D"]);
     let no_s_hand_1 = PokerHand::sorted(vec!["QD", "8C", "7C", "6C", "5D"]);
     let no_s_hand_2 = PokerHand::sorted(vec!["7D", "TD", "JD", "QD", "KS"]);
 
@@ -244,8 +248,8 @@ fn test_poker_hand_straight() {
 
 #[test]
 fn test_poker_hand_two_pairs() {
-    let tp_hand = PokerHand::sorted(vec!["2S", "2D", "3D", "3S", "5D"]);
-    let no_tp_hand = PokerHand::sorted(vec!["7D", "TD", "JD", "QD", "KS"]);
+    let mut tp_hand = PokerHand::sorted(vec!["2S", "2D", "3D", "3S", "5D"]);
+    let mut no_tp_hand = PokerHand::sorted(vec!["7D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(tp_hand.is_two_pairs(), true);
     assert_eq!(tp_hand.rank(), 2);
@@ -254,7 +258,7 @@ fn test_poker_hand_two_pairs() {
 
 #[test]
 fn test_poker_hand_high_card() {
-    let h_hand = PokerHand::sorted(vec!["2S", "3D", "4C", "5S", "7D"]);
+    let mut h_hand = PokerHand::sorted(vec!["2S", "3D", "4C", "5S", "7D"]);
 
     assert_eq!(h_hand.rank(), 0);
 }
@@ -287,12 +291,15 @@ fn problem_54() -> u16 {
     games.remove(games.len() - 1);
 
     for game in &games {
-        let v1 = hand_to_cards(&game[0..14]);
-        let v2 = hand_to_cards(&game[15..]);
+        let mut v1 = hand_to_cards(&game[0..14]);
+        let mut v2 = hand_to_cards(&game[15..]);
 
-        if v1.rank() > v2.rank() {
+        let v1_rank = v1.rank();
+        let v2_rank = v2.rank();
+
+        if v1_rank > v2_rank {
             wins += 1
-        } else if v1.rank() == v2.rank() {
+        } else if v1_rank == v2_rank {
             let mut v1_iter = v1.iter();
             let mut v2_iter = v2.iter();
 
@@ -301,6 +308,10 @@ fn problem_54() -> u16 {
                     (Some(p1), Some(p2)) => {
                         if p1 > p2 {
                             wins += 1;
+                            break;
+                        }
+
+                        if p2 > p1 {
                             break;
                         }
                     },
@@ -315,5 +326,5 @@ fn problem_54() -> u16 {
 
 #[test]
 fn test_problem_54() {
-    assert_eq!(problem_54(), 491);
+    assert_eq!(problem_54(), 376);
 }
