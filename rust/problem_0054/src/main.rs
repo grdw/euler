@@ -5,6 +5,13 @@ const CARDS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'
 ];
 
+fn card_value(value: char) -> usize {
+    CARDS
+        .iter()
+        .position(|&r| r == value)
+        .unwrap()
+}
+
 #[derive(Debug)]
 struct PokerHand<'a>(Vec<&'a str>, Vec<char>);
 
@@ -21,10 +28,7 @@ impl Iterator for PokerHandIter<'_> {
             None
         } else {
             let card = self.inner.1[self.index];
-            let value = CARDS
-                .iter()
-                .position(|&r| r == card)
-                .unwrap();
+            let value = card_value(card);
 
             self.index += 1;
             Some(CARDS.len() - value)
@@ -35,9 +39,7 @@ impl Iterator for PokerHandIter<'_> {
 impl PokerHand<'_> {
     pub fn sorted(mut cards: Vec<&str>) -> PokerHand {
         cards.sort_by_key(|a|
-            CARDS
-                .iter()
-                .position(|&r| r == a.chars().nth(0).unwrap())
+            card_value(a.chars().nth(0).unwrap())
         );
 
         PokerHand(cards, vec![])
