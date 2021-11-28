@@ -2,14 +2,28 @@ use std::{fs, str};
 use std::collections::HashMap;
 
 const CARDS: [char; 13] = [
-    '2', '3', '4', '5', '6', '7', '8', '9', 'T', 'J', 'Q', 'K', 'A'
+    'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'
 ];
 
 #[derive(Debug)]
 struct PokerHand<'a>(Vec<&'a str>);
 
+//impl Iterator for PokerHand {
+//    type Item
+//}
+
 impl PokerHand<'_> {
-    pub fn value(&self) -> u16 {
+    pub fn sorted(mut cards: Vec<&str>) -> PokerHand {
+        cards.sort_by_key(|a|
+            CARDS
+                .iter()
+                .position(|&r| r == a.chars().nth(0).unwrap())
+        );
+
+        PokerHand(cards)
+    }
+
+    pub fn rank(&self) -> u16 {
         if self.is_royal_flush() {
             9
         } else if self.is_straight_flush() {
@@ -34,7 +48,7 @@ impl PokerHand<'_> {
     }
 
     pub fn is_royal_flush(&self) -> bool {
-        let check = &CARDS[8..13];
+        let check = &CARDS[0..5];
         let cards = &self.0;
         let suite = cards[0].chars().nth(1);
 
@@ -82,7 +96,7 @@ impl PokerHand<'_> {
                 let prev_val = prev_position.unwrap();
                 let pos_val = position.unwrap();
 
-                if pos_val > prev_val && pos_val - prev_val > 1 {
+                if pos_val < prev_val && prev_val - pos_val > 1 {
                     straight = false;
                     break;
                 }
@@ -132,13 +146,20 @@ impl PokerHand<'_> {
 }
 
 #[test]
+fn test_poker_hand_sorted() {
+    let hand = PokerHand::sorted(vec!["TD", "JD", "QD", "KD", "AD"]);
+
+    assert_eq!(hand.0, vec!["AD", "KD", "QD", "JD", "TD"])
+}
+
+#[test]
 fn test_poker_hand_royal_flush() {
     let rf_hand = PokerHand(vec!["TD", "JD", "QD", "KD", "AD"]);
     let no_rf_hand = PokerHand(vec!["TD", "JD", "QD", "KD", "AS"]);
 
     assert_eq!(rf_hand.is_royal_flush(), true);
     assert_eq!(no_rf_hand.is_royal_flush(), false);
-    assert_eq!(rf_hand.value(), 9);
+    assert_eq!(rf_hand.rank(), 9);
 }
 
 #[test]
@@ -148,7 +169,7 @@ fn test_poker_hand_straight_flush() {
     let no_sf_hand_2 = PokerHand(vec!["8D", "TD", "JD", "QD", "KD"]);
 
     assert_eq!(sf_hand.is_straight_flush(), true);
-    assert_eq!(sf_hand.value(), 8);
+    assert_eq!(sf_hand.rank(), 8);
     assert_eq!(no_sf_hand_1.is_straight_flush(), false);
     assert_eq!(no_sf_hand_2.is_straight_flush(), false);
 }
@@ -159,7 +180,7 @@ fn test_poker_hand_four_of_a_kind() {
     let no_foak_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(foak_hand.is_four_of_a_kind(), true);
-    assert_eq!(foak_hand.value(), 7);
+    assert_eq!(foak_hand.rank(), 7);
     assert_eq!(no_foak_hand.is_four_of_a_kind(), false);
 }
 
@@ -169,7 +190,7 @@ fn test_poker_hand_full_house() {
     let no_fh_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(fh_hand.is_full_house(), true);
-    assert_eq!(fh_hand.value(), 6);
+    assert_eq!(fh_hand.rank(), 6);
     assert_eq!(no_fh_hand.is_full_house(), false);
 }
 
@@ -179,7 +200,7 @@ fn test_poker_hand_flush() {
     let no_f_hand = PokerHand(vec!["9D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(f_hand.is_flush(), true);
-    assert_eq!(f_hand.value(), 5);
+    assert_eq!(f_hand.rank(), 5);
     assert_eq!(no_f_hand.is_flush(), false);
 }
 
@@ -189,7 +210,7 @@ fn test_poker_hand_straight() {
     let no_s_hand = PokerHand(vec!["7D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(s_hand.is_straight(), true);
-    assert_eq!(s_hand.value(), 4);
+    assert_eq!(s_hand.rank(), 4);
     assert_eq!(no_s_hand.is_straight(), false);
 }
 
@@ -199,8 +220,15 @@ fn test_poker_hand_two_pairs() {
     let no_tp_hand = PokerHand(vec!["7D", "TD", "JD", "QD", "KS"]);
 
     assert_eq!(tp_hand.is_two_pairs(), true);
-    assert_eq!(tp_hand.value(), 2);
+    assert_eq!(tp_hand.rank(), 2);
     assert_eq!(no_tp_hand.is_two_pairs(), false);
+}
+
+#[test]
+fn test_poker_hand_high_card() {
+    let h_hand = PokerHand(vec!["2S", "3D", "4C", "5S", "7D"]);
+
+    assert_eq!(h_hand.rank(), 0);
 }
 
 fn hand_to_cards(hand: &str) -> PokerHand {
@@ -218,17 +246,7 @@ fn hand_to_cards(hand: &str) -> PokerHand {
         }
     }
 
-    PokerHand(cards)
-}
-
-fn value_hand(hand: &str) -> u16 {
-    let cards = hand_to_cards(hand);
-    cards.value()
-}
-
-#[test]
-fn test_value_hand() {
-    assert_eq!(value_hand("5H 5C 6S 7S KD"), 1)
+    PokerHand::sorted(cards)
 }
 
 fn problem_54() -> u16 {
@@ -241,13 +259,13 @@ fn problem_54() -> u16 {
     games.remove(games.len() - 1);
 
     for game in &games {
-        let v1 = value_hand(&game[0..14]);
-        let v2 = value_hand(&game[15..]);
+        let v1 = hand_to_cards(&game[0..14]);
+        let v2 = hand_to_cards(&game[15..]);
 
-        if v1 > v2 {
+        if v1.rank() > v2.rank() {
             wins += 1
-        } else if v1 == v2 {
-            println!("{:?} {} {}", game, v1, v2);
+        } else if v1.rank() == v2.rank() {
+            println!("{:?} {:?}", v1, v2);
         }
     }
 
