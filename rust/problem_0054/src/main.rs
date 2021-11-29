@@ -1,4 +1,4 @@
-use std::{fs, str};
+use std::fs;
 
 const CARDS: [char; 13] = [
     'A', 'K', 'Q', 'J', 'T', '9', '8', '7', '6', '5', '4', '3', '2'
