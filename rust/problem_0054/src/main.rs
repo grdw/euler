@@ -18,10 +18,10 @@ const RANKS: [&'static str; 10] = [
 ];
 
 
-fn card_value(value: char) -> usize {
+fn card_value(value: &str) -> usize {
     CARDS
         .iter()
-        .position(|&r| r == value)
+        .position(|&r| r == value.chars().nth(0).unwrap())
         .unwrap()
 }
 
@@ -31,7 +31,7 @@ struct PokerHand<'a>(Vec<&'a str>);
 impl PokerHand<'_> {
     pub fn sorted(mut cards: Vec<&str>) -> PokerHand {
         cards.sort_by_key(|a|
-            card_value(a.chars().nth(0).unwrap())
+            card_value(a)
         );
 
         PokerHand(cards)
@@ -151,11 +151,9 @@ impl PokerHand<'_> {
     }
 
     pub fn is_high_card(&self) -> Option<Vec<usize>> {
-        let highest_card = self.0[0].chars().nth(0).unwrap();
-
         Some(
             vec![
-                0, CARDS.len() - card_value(highest_card)
+                0, CARDS.len() - card_value(self.0[0])
             ]
         )
     }
@@ -170,7 +168,7 @@ impl PokerHand<'_> {
         let cards = &self.0;
 
         for &c in cards {
-            let value = CARDS.len() - card_value(c.chars().nth(0).unwrap());
+            let value = CARDS.len() - card_value(c);
             vals[value] += 1;
 
             if vals[value] == max {
