@@ -30,9 +30,7 @@ struct PokerHand<'a>(Vec<&'a str>);
 
 impl PokerHand<'_> {
     pub fn sorted(mut cards: Vec<&str>) -> PokerHand {
-        cards.sort_by_key(|a|
-            card_value(a)
-        );
+        cards.sort_by_key(|a| card_value(a));
 
         PokerHand(cards)
     }
