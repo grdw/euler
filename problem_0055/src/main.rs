@@ -20,24 +20,34 @@ pub trait VecEx<U8> {
 
 impl VecEx<u8> for Vec<u8> {
     fn sum_vec(&mut self, total: &Vec<u8>) {
-        let mut prev_div = 0;
+        let mut remainder = 0;
+        let mut len = self.len();
 
-        if self.len() < total.len() {
-            self.resize(total.len(), 0);
-        }
-
-        for (i, x) in self.iter_mut().enumerate() {
-            let subt = *x + total.get(i).unwrap_or(&0) + prev_div;
+        while len > 0 {
+            let i = len - 1;
+            let subt = self[i] + total[i] + remainder;
             let (div, modulo) = (subt / 10, subt % 10);
 
-            *x = modulo;
-            prev_div = div;
+            self[i] = modulo;
+            remainder = div;
+            len -= 1;
         }
 
-        if prev_div > 0 {
-            self.push(prev_div);
+        if remainder > 0 {
+            self.insert(0, remainder);
         }
     }
+}
+
+#[test]
+fn test_sum_vec() {
+    let mut d = vec![1, 5, 8, 8];
+    d.sum_vec(&vec![9, 9, 9, 9]);
+    assert_eq!(d, vec![1, 1, 5, 8, 7]);
+
+    let mut d2 = vec![4, 7];
+    d2.sum_vec(&vec![7, 4]);
+    assert_eq!(d2, vec![1, 2, 1]);
 }
 
 fn is_palindrome(digits: &Vec<u8>) -> bool {
@@ -60,6 +70,7 @@ fn is_lychrel(n: u32) -> bool {
         digits_rev.reverse();
         digits.sum_vec(&digits_rev);
 
+        println!("{:?}", digits);
         if is_palindrome(&digits) {
             is_lychrel = false;
             break;
