@@ -70,7 +70,6 @@ fn is_lychrel(n: u32) -> bool {
         digits_rev.reverse();
         digits.sum_vec(&digits_rev);
 
-        println!("{:?}", digits);
         if is_palindrome(&digits) {
             is_lychrel = false;
             break;
