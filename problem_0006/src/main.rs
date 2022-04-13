@@ -1,7 +1,7 @@
 fn problem_6() -> u128 {
     let mut sum: u128 = 0;
     let mut n_sum: u128 = 0;
-    for n in 1..100 {
+    for n in 1..=100 {
         sum += (n as u128).pow(2);
         n_sum += n;
     }
@@ -10,5 +10,5 @@ fn problem_6() -> u128 {
 
 #[test]
 fn test_problem_6() {
-    assert_eq!(problem_6(), 24174150);
+    assert_eq!(problem_6(), 25164150);
 }
