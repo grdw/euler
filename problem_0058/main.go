@@ -30,16 +30,16 @@ func problem58() int {
     var factor int = 2
 
     for {
-        for k := 0; k < 4; k++ {
-            start += factor
-            total++
+        start += factor
+        total++
 
-            if isPrime(start) {
-                primes++
-            }
+        if isPrime(start) {
+            primes++
         }
 
-        factor += 2
+        if total % 4 == 1 {
+          factor += 2
+        }
 
         if (float64(primes) / float64(total)) < 0.10 {
             break
