@@ -10,17 +10,17 @@ func isPrime(num int) bool {
       return false
     }
 
-    var is_prime bool = true
+    var isPrime bool = true
     var end int = int(math.Floor(math.Sqrt(float64(num))))
 
     for i := 2; i <= end + 1; i++ {
         if num % i == 0 {
-            is_prime = false
+            isPrime = false
             break
         }
     }
 
-    return is_prime
+    return isPrime
 }
 
 func main() {
