@@ -23,12 +23,13 @@ func isPrime(num int) bool {
     return isPrime
 }
 
-func diagonal(size int) float64 {
+func problem58() int {
     var start int = 1
     var total int = 1;
     var primes int = 0;
+    var factor int = 1;
 
-    for factor := 1; factor < size; factor++ {
+    for {
         for k := 0; k < 4; k++ {
             start += (factor * 2)
             total++
@@ -37,9 +38,15 @@ func diagonal(size int) float64 {
                 primes++
             }
         }
+
+        factor++
+
+        if (float64(primes) / float64(total)) < 0.10 {
+            break
+        }
     }
 
-    return float64(primes) / float64(total)
+    return (factor * 2) - 1
 }
 
 func main() {

@@ -14,5 +14,5 @@ func TestIsPrime(t *testing.T) {
 }
 
 func TestProblem58(t *testing.T) {
-    assert.Equal(t, diagonal(4), 0.6153846153846154)
+    assert.Equal(t, problem58(), 26241)
 }
