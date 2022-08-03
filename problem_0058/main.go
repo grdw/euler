@@ -25,13 +25,13 @@ func isPrime(num int) bool {
 
 func problem58() int {
     var start int = 1
-    var total int = 1;
-    var primes int = 0;
-    var factor int = 1;
+    var total int = 1
+    var primes int = 0
+    var factor int = 2
 
     for {
         for k := 0; k < 4; k++ {
-            start += (factor * 2)
+            start += factor
             total++
 
             if isPrime(start) {
@@ -39,14 +39,14 @@ func problem58() int {
             }
         }
 
-        factor++
+        factor += 2
 
         if (float64(primes) / float64(total)) < 0.10 {
             break
         }
     }
 
-    return (factor * 2) - 1
+    return factor - 1
 }
 
 func main() {
