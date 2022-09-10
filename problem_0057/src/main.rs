@@ -1,7 +1,8 @@
 use std::cmp;
 
 fn main() {
-    println!("Hello world")
+    let result = sqrt_of_2(1000);
+    println!("The answer to euler#57 is {}", result)
 }
 
 pub trait ToVector {
