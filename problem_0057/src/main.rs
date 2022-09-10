@@ -85,7 +85,6 @@ fn sqrt_of_2(n: u128) -> u128 {
         den = den.sum_vec(&num);
         num = den.sum_vec(&prev_den);
 
-        println!("{:?} {:?}", den, num);
         if num.len() > den.len() {
             counts += 1;
         }
