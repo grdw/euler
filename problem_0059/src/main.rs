@@ -110,7 +110,7 @@ fn problem_59() -> u64 {
     let mut sum = 0;
     let mut password = Password(vec![ASCII_MIN, ASCII_MIN, ASCII_MIN - 1]);
 
-    'outer: loop {
+    loop {
         match password.next() {
             Some(next_password) => {
                 let string = parse_password(&list, next_password);
@@ -119,7 +119,7 @@ fn problem_59() -> u64 {
                     break;
                 }
             },
-            None => break 'outer
+            None => break
         }
     }
 
