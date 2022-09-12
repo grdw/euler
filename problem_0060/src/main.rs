@@ -70,60 +70,62 @@ fn test_prime_pair_set() {
     assert_eq!(is_prime_pair_set(&vec![2, 3, 5, 7, 11]), false);
 }
 
-fn problem_60(size: usize) -> u64 {
-    let mut max = 100_000;
-    let mut group = vec![2];
-    let mut index = 0;
-    let mut reset_count = 0;
+fn sieve_of_erato(n: usize) -> Vec<bool> {
+    let mut primes = vec![true; n + 1];
+    let max = (n as f64).sqrt() as usize;
 
-    loop {
-        group[index] = next_prime(group[index]);
-
-        if is_prime_pair_set(&group) {
-            if index == size - 1 {
-                let total = group.iter().sum();
-
-                println!("{:?} -> {}", group, total);
-                if total < max {
-                    max = total;
-                    for i in 0..index { group.pop(); }
-                    index = 0;
-                }
-
-                continue;
+    for i in 2..=max {
+        if primes[i] {
+            let mut j = i.pow(2);
+            while j <= n {
+                primes[j] = false;
+                j += i
             }
-
-            let next_prime = next_prime(group[index]);
-            group.push(next_prime);
-            index += 1;
-        }
-
-        if group.iter().sum::<u64>() > max {
-            println!("RESET! {:?}", group);
-            for i in 1..index { group.pop(); }
-            index = 1;
-            reset_count += 1;
-
-            if reset_count > 1 {
-                print!("FULL \n");
-                group.pop();
-                index = 0;
-                reset_count = 0;
-            }
-        } else {
-            reset_count = 0;
-        }
-
-        if group[0] > max {
-            break;
         }
     }
 
-    max
+    primes
+}
+
+fn find_next(mut value: u64, sieve: &Vec<bool>) -> u64 {
+    for i in (value as usize)+1..sieve.len() {
+        value += 1;
+
+        if sieve[i] {
+            return i as u64
+        }
+    }
+
+    return 0
+}
+
+fn problem_60(size: usize) -> u64 {
+    let primes = sieve_of_erato(1_000_000);
+    let mut group = vec![2];
+    let mut index = 0;
+
+    loop {
+        group[index] = find_next(group[index], &primes);
+
+        if is_prime_pair_set(&group) {
+            if group.len() == size {
+                break;
+            }
+
+            group.push(find_next(group[index], &primes));
+            index += 1;
+        }
+    }
+
+    group.iter().sum()
 }
 
 #[test]
-fn test_problem_60() {
+fn test_problem_60_example() {
+    assert_eq!(problem_60(4), 792);
+}
+
+#[test]
+fn test_problem_60_real_deal() {
     assert_eq!(problem_60(5), 792);
-    //assert_eq!(problem_60(5), 792);
 }
