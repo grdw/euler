@@ -101,6 +101,7 @@ fn find_next(mut value: u64, sieve: &Vec<bool>) -> u64 {
 
 fn problem_60(size: usize) -> u64 {
     let primes = sieve_of_erato(1_000_000);
+    let mut upper_bound = 100_000;
     let mut group = vec![2];
     let mut index = 0;
 
@@ -114,6 +115,16 @@ fn problem_60(size: usize) -> u64 {
 
             group.push(find_next(group[index], &primes));
             index += 1;
+        }
+
+        println!("{:?}", group);
+        // Piss poor reset function
+        if group.iter().sum::<u64>() > upper_bound {
+            for _ in 2..group.len() {
+                group.pop();
+            }
+
+            index = 1;
         }
     }
 
