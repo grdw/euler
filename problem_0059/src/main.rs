@@ -7,79 +7,71 @@ fn main() {
 const ASCII_MIN:u8 = 97;
 const ASCII_MAX:u8 = 122;
 
-#[derive(Debug, PartialEq)]
-struct Password(Vec<u8>);
-
-impl Iterator for Password {
-    type Item = Self;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.0.iter().all(|&n| n == ASCII_MAX) {
-            return None
-        }
-
-        let max = self.0.len();
-
-        for i in (0..max).rev() {
-            if self.0[i] < ASCII_MAX {
-                self.0[i] += 1;
-                break;
-            } else {
-                self.0[i] = ASCII_MIN;
-            }
-        }
-
-        Some(Password(self.0.clone()))
+fn next(vec: &mut Vec<u8>) -> Option<&mut Vec<u8>> {
+    if vec.iter().all(|&n| n == ASCII_MAX) {
+        return None
     }
+
+    let max = vec.len();
+
+    for i in (0..max).rev() {
+        if vec[i] < ASCII_MAX {
+            vec[i] += 1;
+            break;
+        } else {
+            vec[i] = ASCII_MIN;
+        }
+    }
+
+    Some(vec)
 }
 
 #[test]
 fn test_password_iterator_simple_case() {
-    let mut password = Password(vec![ASCII_MIN, ASCII_MIN, ASCII_MIN]);
-    let next = password.next().unwrap();
+    let mut password = vec![ASCII_MIN, ASCII_MIN, ASCII_MIN];
+    let next = next(&mut password).unwrap();
 
-    assert_eq!(next, Password(vec![97, 97, 98]));
+    assert_eq!(next, &vec![97, 97, 98]);
 }
 
 #[test]
 fn test_password_iterator_simple_over_max() {
-    let mut password = Password(vec![97, 97, 122]);
-    let next = password.next().unwrap();
+    let mut password = vec![97, 97, 122];
+    let next = next(&mut password).unwrap();
 
-    assert_eq!(next, Password(vec![97, 98, 97]));
+    assert_eq!(next, &vec![97, 98, 97]);
 }
 
 #[test]
 fn test_password_iterator_simple_over_max_0() {
-    let mut password = Password(vec![97, 122, 122]);
-    let next = password.next().unwrap();
+    let mut password = vec![97, 122, 122];
+    let n = next(&mut password).unwrap();
 
-    assert_eq!(next, Password(vec![98, 97, 97]));
+    assert_eq!(n, &vec![98, 97, 97]);
 }
 
 #[test]
 fn test_password_iterator_end() {
-    let mut password = Password(vec![ASCII_MAX, ASCII_MAX, ASCII_MAX]);
-    let next = password.next();
+    let mut password = vec![ASCII_MAX, ASCII_MAX, ASCII_MAX];
+    let n = next(&mut password);
 
-    assert_eq!(next, None);
+    assert_eq!(n, None);
 
-    let mut password = Password(vec![97, 97, 97]);
-    let mut next = password.next();
+    let mut password = vec![97, 97, 97];
+    let mut n = next(&mut password);
 
     for _ in 0..50_024 {
-        next = password.next()
+        n = next(&mut password)
     }
 
-    assert_eq!(next, None);
+    assert_eq!(n, None);
 }
 
-fn parse_password(text: &Vec<u8>, password: Password) -> String {
+fn parse_password(text: &Vec<u8>, password: &Vec<u8>) -> String {
     let mut result = String::from("");
-    let pw = password.0;
 
     for i in 0..text.len() {
-        let res = text[i] ^ pw[i % pw.len()];
+        let res = text[i] ^ password[i % password.len()];
         result.push(res as char);
     };
     result
@@ -88,12 +80,12 @@ fn parse_password(text: &Vec<u8>, password: Password) -> String {
 #[test]
 fn test_parse_password() {
     let list: Vec<u8> = vec![65, 65, 65];
-    let answer = parse_password(&list, Password(vec![42, 42, 42]));
+    let answer = parse_password(&list, &vec![42, 42, 42]);
 
     assert_eq!(answer, "kkk");
 
     let list: Vec<u8> = vec![36,22,80,0,0,4,23,25,19,17,88,4,4,19,21];
-    let answer = parse_password(&list, Password(vec![100, 102, 99]));
+    let answer = parse_password(&list, &vec![100, 102, 99]);
 
     assert_eq!(answer, "@p3dfgs\u{7f}pu>g`uv");
 }
@@ -108,12 +100,12 @@ fn problem_59() -> u64 {
         .collect();
 
     let mut sum = 0;
-    let mut password = Password(vec![ASCII_MIN, ASCII_MIN, ASCII_MIN - 1]);
+    let mut password = vec![ASCII_MIN, ASCII_MIN, ASCII_MIN - 1];
 
     loop {
-        match password.next() {
+        match next(&mut password) {
             Some(next_password) => {
-                let string = parse_password(&list, next_password);
+                let string = parse_password(&list, &next_password);
                 if string.contains(" and ") {
                     sum = string.as_bytes().iter().map(|x| *x as u64).sum();
                     break;
