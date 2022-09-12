@@ -1,92 +1,82 @@
 use std::fs;
 
 fn main() {
-    println!("Hello, world!");
+    println!("The solution to problem_59 = {}", problem_59());
 }
 
 const ASCII_MIN:u8 = 97;
 const ASCII_MAX:u8 = 122;
 
 #[derive(Debug, PartialEq)]
-struct Password(u8, u8, u8);
-
-#[derive(Debug)]
-enum Action {
-    AddTo2,
-    AddTo1,
-    AddTo0,
-    Max
-}
+struct Password(Vec<u8>);
 
 impl Iterator for Password {
     type Item = Self;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let action: Action =
-            if self.2 < ASCII_MAX {
-                Action::AddTo2
-            } else if self.1 < ASCII_MAX {
-                Action::AddTo1
-            } else if self.0 < ASCII_MAX {
-                Action::AddTo0
-            } else {
-                Action::Max
-            };
-
-        match action {
-            Action::AddTo2 => {
-                self.2 += 1;
-                Some(Password(self.0, self.1, self.2))
-            }
-            Action::AddTo1 => {
-                self.1 += 1;
-                self.2 = ASCII_MIN;
-                Some(Password(self.0, self.1, self.2))
-            },
-            Action::AddTo0 => {
-                self.0 += 1;
-                self.1 = ASCII_MIN;
-                self.2 = ASCII_MIN;
-                Some(Password(self.0, self.1, self.2))
-            },
-            Action::Max => None
+        if self.0.iter().all(|&n| n == ASCII_MAX) {
+            return None
         }
+
+        let max = self.0.len();
+
+        for i in (0..max).rev() {
+            if self.0[i] < ASCII_MAX {
+                self.0[i] += 1;
+                break;
+            } else {
+                self.0[i] = ASCII_MIN;
+            }
+        }
+
+        Some(Password(self.0.clone()))
     }
 }
 
 #[test]
-fn test_password_iterator() {
-    let mut password = Password(ASCII_MIN, ASCII_MIN, ASCII_MIN);
+fn test_password_iterator_simple_case() {
+    let mut password = Password(vec![ASCII_MIN, ASCII_MIN, ASCII_MIN]);
     let next = password.next().unwrap();
 
-    assert_eq!(next, Password(97, 97, 98));
+    assert_eq!(next, Password(vec![97, 97, 98]));
 }
 
 #[test]
-fn test_password_iterator_max() {
-    let mut password = Password(ASCII_MIN, ASCII_MIN, ASCII_MIN);
-    let mut next = password.next().unwrap();
-    for _ in 0..25 {
-        next = password.next().unwrap();
-    }
+fn test_password_iterator_simple_over_max() {
+    let mut password = Password(vec![97, 97, 122]);
+    let next = password.next().unwrap();
 
-    assert_eq!(next, Password(97, 98, 97));
+    assert_eq!(next, Password(vec![97, 98, 97]));
 }
 
 #[test]
-fn test_password_iterator_three_cycles() {
-    let mut password = Password(ASCII_MIN, ASCII_MIN, ASCII_MIN);
-    let mut next = password.next().unwrap();
-    for _ in 0..77 {
-        next = password.next().unwrap();
+fn test_password_iterator_simple_over_max_0() {
+    let mut password = Password(vec![97, 122, 122]);
+    let next = password.next().unwrap();
+
+    assert_eq!(next, Password(vec![98, 97, 97]));
+}
+
+#[test]
+fn test_password_iterator_end() {
+    let mut password = Password(vec![ASCII_MAX, ASCII_MAX, ASCII_MAX]);
+    let next = password.next();
+
+    assert_eq!(next, None);
+
+    let mut password = Password(vec![97, 97, 97]);
+    let mut next = password.next();
+
+    for _ in 0..50_024 {
+        next = password.next()
     }
 
-    assert_eq!(next, Password(97, 100, 97));
+    assert_eq!(next, None);
 }
 
 fn parse_password(text: &Vec<u8>, password: Password) -> String {
     let mut result = String::from("");
-    let pw = vec![password.0, password.1, password.2];
+    let pw = password.0;
 
     for i in 0..text.len() {
         let res = text[i] ^ pw[i % pw.len()];
@@ -98,12 +88,12 @@ fn parse_password(text: &Vec<u8>, password: Password) -> String {
 #[test]
 fn test_parse_password() {
     let list: Vec<u8> = vec![65, 65, 65];
-    let answer = parse_password(&list, Password(42, 42, 42));
+    let answer = parse_password(&list, Password(vec![42, 42, 42]));
 
     assert_eq!(answer, "kkk");
 
     let list: Vec<u8> = vec![36,22,80,0,0,4,23,25,19,17,88,4,4,19,21];
-    let answer = parse_password(&list, Password(100, 102, 99));
+    let answer = parse_password(&list, Password(vec![100, 102, 99]));
 
     assert_eq!(answer, "@p3dfgs\u{7f}pu>g`uv");
 }
@@ -118,7 +108,7 @@ fn problem_59() -> u64 {
         .collect();
 
     let mut sum = 0;
-    let mut password = Password(ASCII_MIN, ASCII_MIN, ASCII_MIN - 1);
+    let mut password = Password(vec![ASCII_MIN, ASCII_MIN, ASCII_MIN - 1]);
 
     'outer: loop {
         match password.next() {
