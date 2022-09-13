@@ -1,3 +1,4 @@
+use std::collections::HashMap;
 use std::{thread, time::Duration};
 
 fn main() {
@@ -80,6 +81,27 @@ fn digit_match(x: &u32, y: &u32) -> bool {
     last_digits == first_digits
 }
 
+#[derive(Debug)]
+struct Route {
+    direction: char,
+    value: u32,
+    list: usize
+}
+
+impl Route {
+    fn new(direction: char, value: u32, list: usize) -> Self {
+        Route { direction: direction, value: value, list: list }
+    }
+
+    fn left(value: u32, list: usize) -> Self {
+        Route::new('L', value, list)
+    }
+
+    fn right(value: u32, list: usize) -> Self {
+        Route::new('R', value, list)
+    }
+}
+
 fn problem_61() -> u32 {
     let mut list = vec![
         create_list(&triangle),
@@ -91,31 +113,86 @@ fn problem_61() -> u32 {
     ];
 
 
-    let mut group = vec![];
-    let mut index = 0;
-    let mut filter = vec![index];
+    let mut routes: HashMap<&u32, Vec<Route>> = HashMap::new();
 
-    loop {
-        let current = list[index][0];
+    for (i, sub_list) in list.iter().enumerate() {
+        for current in sub_list {
+            for j in 0..list.len() {
+                if i == j { continue };
 
-        for i in 0..list.len() {
-            if !filter.contains(&i) {
-                let mut candidates: Vec<&u32> = list[i]
+                for righties in list[j]
                     .iter()
-                    .filter(|v| digit_match(&current, v))
-                    .collect();
+                    .filter(|v| digit_match(&current, v)) {
+                        routes
+                            .entry(current)
+                            .and_modify(|v| v.push(
+                                Route::right(*righties, j)
+                            ))
+                            .or_insert(vec![
+                                Route::right(*righties, j)
+                            ]);
+                    }
 
-                if candidates.is_empty() {
-                    continue;
-                }
-
-                println!("{}", current);
-                println!("{:?} from {}", candidates, i);
+                for lefties in list[j]
+                    .iter()
+                    .filter(|v| digit_match(v, &current)) {
+                        routes
+                            .entry(current)
+                            .and_modify(|v| v.push(
+                                Route::left(*lefties, j)
+                            ))
+                            .or_insert(vec![
+                                Route::left(*lefties, j)
+                            ]);
+                    }
             }
         }
-
-        break;
     }
+
+    // Drop of all routes which only all point to the left
+    // or all point to the right. These are not circular.
+    routes.retain(|_, value| {
+        !(value.iter().all(|r| r.direction == 'L') ||
+          value.iter().all(|r| r.direction == 'R'))
+    });
+
+    let mut group = vec![];
+    for (key, value) in &routes {
+        println!("\n----\n{:?}", key);
+        group.push(key);
+
+        for route in value {
+            // Find any route to the right, keep on going to
+            // the right. If there are a substantial amount of
+            match routes.get(&route.value) {
+                Some(sub_routes) => {
+                    let f: Vec<&Route> = sub_routes
+                        .iter()
+                        .filter(|r| route.direction == r.direction && route.list != r.list)
+                        .collect();
+
+                    println!("{:?}", f);
+                },
+                None => println!("Rien")
+            }
+        }
+    }
+
+    //loop {
+    //    thread::sleep(Duration::from_millis(2000));
+    //    windex += 1;
+
+    //    let all_match = (0..group.len()).all(|i| {
+    //        let x = group[i];
+    //        let y = group[(i + 1) % group.len()];
+
+    //        digit_match(&x, &y)
+    //    });
+
+    //    if all_match && group.len() == 6 {
+    //        break;
+    //    }
+    //}
     0
 }
 
