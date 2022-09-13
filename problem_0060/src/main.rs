@@ -1,7 +1,8 @@
 use std::collections::HashSet;
 
 fn main() {
-    println!("Hello, world!");
+    let answer = problem_60(5);
+    println!("The lowest sum is: {}", answer);
 }
 
 fn is_prime(number: u64, cache: &mut HashSet<u64>) -> bool {
@@ -115,41 +116,26 @@ fn problem_60(size: usize) -> u64 {
     let primes = sieve_of_erato(1_000_000);
     let mut cache = HashSet::new();
     let mut upper_bound = 100_000;
-    let mut group = vec![];
+    let mut group = vec![0];
     let mut index = 0;
-    let mut start = 0;
 
     loop {
         match group.get(index) {
-            Some(_) => {
-                group[index] = find_next(group[index], &primes)
-            }
-            None => {
-                let value = if index > 0 {
-                    group[index - 1]
-                } else {
-                    start
-                };
-
-                group.push(find_next(value, &primes))
-            }
+            Some(_) => group[index] = find_next(group[index], &primes),
+            None => group.push(find_next(group[index - 1], &primes))
         }
 
         let total = group.iter().sum();
 
         if is_prime_pair_set(&group, &mut cache) {
+            index += 1;
+
             if group.len() == size {
                 if total < upper_bound {
-                    println!("🥁 {}", total);
-                    group.truncate(1);
                     index = 0;
-                    start = find_next(start, &primes);
                     upper_bound = total;
                 }
-                continue;
             }
-
-            index += 1;
         }
 
         if group[0] > upper_bound {
@@ -157,16 +143,14 @@ fn problem_60(size: usize) -> u64 {
         }
 
         // Piss poor reset function
-        if total > upper_bound {
+        if total >= upper_bound {
             if index < 3 {
                 group.truncate(1);
                 index = 0;
             } else {
-                println!("{} {:?}", index, group);
                 group.truncate(2);
                 index = 1;
             }
-
         }
     }
 
