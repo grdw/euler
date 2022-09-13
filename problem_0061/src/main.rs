@@ -1,3 +1,5 @@
+use std::{thread, time::Duration};
+
 fn main() {
     println!("Hello, world!");
 }
@@ -71,68 +73,71 @@ fn test_create_list() {
     assert_eq!(square_list[square_list.len() - 1], 9976);
 }
 
-fn digit_match(x: u32, y: &u32) -> bool {
+fn digit_match(x: &u32, y: &u32) -> bool {
     let last_digits = x % 100;
     let first_digits = (y - (y % 100)) / 100;
 
     last_digits == first_digits
 }
 
-use std::{thread, time::Duration};
 fn problem_61() -> u32 {
-    let digits = [
+    let mut list = vec![
         create_list(&triangle),
         create_list(&square),
         create_list(&pentagonal),
-        create_list(&hexagonal),
-        create_list(&heptagonal),
-        create_list(&octagonal)
+        //create_list(&hexagonal),
+        //create_list(&heptagonal),
+        //create_list(&octagonal),
+        vec![]
     ];
 
+
     let mut group = vec![];
-    let mut d_index = 0;
-    let mut index = vec![0; digits.len()];
+    let mut index = 0;
+    let mut dyns = vec![0; list.len()];
 
     loop {
-        thread::sleep(Duration::from_millis(1000));
-        let mut pick = digits[d_index][index[d_index]];
-        let next_list = &digits[(d_index + 1) % digits.len()];
-
-        let mut next_index = None;
-        for i in 0..next_list.len() {
-            if digit_match(pick, &next_list[i]) {
-                println!("{} / {} -- {} {} {:?}", pick, next_list[i], d_index, group.len(), group);
-                if d_index == 5 {
-                    if digit_match(pick, &group[0]) {
-                        group.push(pick);
-                        next_index = Some(i);
-                    }
-                } else {
-                    group.push(pick);
-                    next_index = Some(i);
-                }
-            }
+        let cur = dyns[index % list.len()];
+        match group.get(index) {
+            Some(v) => group[index] = list[index % list.len()][cur],
+            None => group.push(list[index % list.len()][cur])
         }
 
-        match next_index {
-            Some(i) => {
-                d_index += 1;
-                index[d_index % digits.len()] = i;
+        if group.len() > 0 {
+            println!("{:?} {}", group, index);
+        }
+
+        let mut next_list = list[index + 1]
+            .iter()
+            .enumerate()
+            .filter(|(ind, v)| digit_match(&group[index], v));
+
+        match next_list.next() {
+            Some((ind, v)) => {
+                index += 1;
+
+                dyns[index] = ind;
             },
             None => {
-                group.truncate(d_index);
-                d_index = group.len();
-                index[d_index] += 1;
+                group.truncate(1);
+                index = 0;
+                dyns[index] += 1
             }
         }
 
-        println!("{:?} d: {} i: {:?}", group, d_index, index);
-        if group.len() == 6 {
+        // Test if all of them "digit match" circularly
+        let all_match = (0..group.len()).all(|i| {
+            let x = group[i];
+            let y = group[(i + 1) % group.len()];
+
+            digit_match(&x, &y)
+        });
+
+        if all_match && group.len() == 3 {
             break;
         }
     }
-
-    group.iter().sum()
+    0
 }
 
 #[test]
