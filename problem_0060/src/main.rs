@@ -130,11 +130,9 @@ fn problem_60(size: usize) -> u64 {
         if is_prime_pair_set(&group, &mut cache) {
             index += 1;
 
-            if group.len() == size {
-                if total < upper_bound {
-                    index = 0;
-                    upper_bound = total;
-                }
+            if group.len() == size && total < upper_bound {
+                index = 0;
+                upper_bound = total;
             }
         }
 
