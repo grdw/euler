@@ -85,45 +85,16 @@ fn problem_61() -> u32 {
         create_list(&triangle),
         create_list(&square),
         create_list(&pentagonal),
-        //create_list(&hexagonal),
-        //create_list(&heptagonal),
-        //create_list(&octagonal),
-        vec![]
+        create_list(&hexagonal),
+        create_list(&heptagonal),
+        create_list(&octagonal)
     ];
 
 
+    // TODO: The order doesn't fucking matter idiot
     let mut group = vec![];
-    let mut index = 0;
-    let mut dyns = vec![0; list.len()];
 
     loop {
-        let cur = dyns[index % list.len()];
-        match group.get(index) {
-            Some(v) => group[index] = list[index % list.len()][cur],
-            None => group.push(list[index % list.len()][cur])
-        }
-
-        if group.len() > 0 {
-            println!("{:?} {}", group, index);
-        }
-
-        let mut next_list = list[index + 1]
-            .iter()
-            .enumerate()
-            .filter(|(ind, v)| digit_match(&group[index], v));
-
-        match next_list.next() {
-            Some((ind, v)) => {
-                index += 1;
-
-                dyns[index] = ind;
-            },
-            None => {
-                group.truncate(1);
-                index = 0;
-                dyns[index] += 1
-            }
-        }
 
         // Test if all of them "digit match" circularly
         let all_match = (0..group.len()).all(|i| {
@@ -133,7 +104,7 @@ fn problem_61() -> u32 {
             digit_match(&x, &y)
         });
 
-        if all_match && group.len() == 3 {
+        if all_match && group.len() == 6 {
             break;
         }
     }
