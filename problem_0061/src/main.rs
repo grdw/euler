@@ -91,22 +91,30 @@ fn problem_61() -> u32 {
     ];
 
 
-    // TODO: The order doesn't fucking matter idiot
     let mut group = vec![];
+    let mut index = 0;
+    let mut filter = vec![index];
 
     loop {
+        let current = list[index][0];
 
-        // Test if all of them "digit match" circularly
-        let all_match = (0..group.len()).all(|i| {
-            let x = group[i];
-            let y = group[(i + 1) % group.len()];
+        for i in 0..list.len() {
+            if !filter.contains(&i) {
+                let mut candidates: Vec<&u32> = list[i]
+                    .iter()
+                    .filter(|v| digit_match(&current, v))
+                    .collect();
 
-            digit_match(&x, &y)
-        });
+                if candidates.is_empty() {
+                    continue;
+                }
 
-        if all_match && group.len() == 6 {
-            break;
+                println!("{}", current);
+                println!("{:?} from {}", candidates, i);
+            }
         }
+
+        break;
     }
     0
 }
