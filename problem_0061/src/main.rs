@@ -1,8 +1,6 @@
-use std::collections::HashMap;
-use std::{thread, time::Duration};
-
 fn main() {
-    println!("Hello, world!");
+    let answer = problem_61();
+    println!("The answer is {}", answer);
 }
 
 const MIN: u32 = 1000;
@@ -81,29 +79,8 @@ fn digit_match(x: &u32, y: &u32) -> bool {
     last_digits == first_digits
 }
 
-#[derive(Debug)]
-struct Route {
-    direction: char,
-    value: u32,
-    list: usize
-}
-
-impl Route {
-    fn new(direction: char, value: u32, list: usize) -> Self {
-        Route { direction: direction, value: value, list: list }
-    }
-
-    fn left(value: u32, list: usize) -> Self {
-        Route::new('L', value, list)
-    }
-
-    fn right(value: u32, list: usize) -> Self {
-        Route::new('R', value, list)
-    }
-}
-
 fn problem_61() -> u32 {
-    let mut list = vec![
+    let list = vec![
         create_list(&triangle),
         create_list(&square),
         create_list(&pentagonal),
@@ -112,91 +89,54 @@ fn problem_61() -> u32 {
         create_list(&octagonal)
     ];
 
+    let mut length = 1;
+    let mut routes: Vec<Vec<(u32, usize)>> =
+        list[0].iter().map(|v| vec![(*v, 0)] ).collect();
 
-    let mut routes: HashMap<&u32, Vec<Route>> = HashMap::new();
+    loop {
+        for route_index in 0..routes.len() {
+            let route = &routes[route_index];
+            let last_el = route[route.len() - 1].0;
+            let skipped_indexes: Vec<usize> = route
+                .iter()
+                .map(|(_, li)| *li)
+                .collect();
 
-    for (i, sub_list) in list.iter().enumerate() {
-        for current in sub_list {
-            for j in 0..list.len() {
-                if i == j { continue };
+            for li in 0..list.len() {
+                if skipped_indexes.contains(&li) {
+                    continue;
+                }
 
-                for righties in list[j]
-                    .iter()
-                    .filter(|v| digit_match(&current, v)) {
-                        routes
-                            .entry(current)
-                            .and_modify(|v| v.push(
-                                Route::right(*righties, j)
-                            ))
-                            .or_insert(vec![
-                                Route::right(*righties, j)
-                            ]);
+                for n in &list[li] {
+                    if digit_match(&last_el, n) {
+                        let mut m = routes[route_index].clone();
+                        m.push((*n, li));
+
+                        routes.push(m);
                     }
-
-                for lefties in list[j]
-                    .iter()
-                    .filter(|v| digit_match(v, &current)) {
-                        routes
-                            .entry(current)
-                            .and_modify(|v| v.push(
-                                Route::left(*lefties, j)
-                            ))
-                            .or_insert(vec![
-                                Route::left(*lefties, j)
-                            ]);
-                    }
+                }
             }
+        }
+
+        routes.retain(|v| v.len() > length - 1);
+        length += 1;
+
+        if length > list.len() {
+            break;
         }
     }
 
-    // Drop of all routes which only all point to the left
-    // or all point to the right. These are not circular.
-    routes.retain(|_, value| {
-        !(value.iter().all(|r| r.direction == 'L') ||
-          value.iter().all(|r| r.direction == 'R'))
-    });
-
-    let mut group = vec![];
-    for (key, value) in &routes {
-        println!("\n----\n{:?}", key);
-        group.push(key);
-
-        for route in value {
-            // Find any route to the right, keep on going to
-            // the right. If there are a substantial amount of
-            match routes.get(&route.value) {
-                Some(sub_routes) => {
-                    let f: Vec<&Route> = sub_routes
-                        .iter()
-                        .filter(|r| route.direction == r.direction && route.list != r.list)
-                        .collect();
-
-                    println!("{:?}", f);
-                },
-                None => println!("Rien")
-            }
+    // Test if there's a route that's circular
+    for r in &routes {
+        if digit_match(&r[5].0, &r[0].0) {
+            return r.iter().map(|(n, _)| n).sum::<u32>()
         }
     }
 
-    //loop {
-    //    thread::sleep(Duration::from_millis(2000));
-    //    windex += 1;
-
-    //    let all_match = (0..group.len()).all(|i| {
-    //        let x = group[i];
-    //        let y = group[(i + 1) % group.len()];
-
-    //        digit_match(&x, &y)
-    //    });
-
-    //    if all_match && group.len() == 6 {
-    //        break;
-    //    }
-    //}
     0
 }
 
 #[test]
 fn test_problem_61() {
-    assert_eq!(problem_61(), 5);
+    assert_eq!(problem_61(), 28684);
 }
