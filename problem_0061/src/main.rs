@@ -90,8 +90,10 @@ fn problem_61() -> u32 {
     ];
 
     let mut length = 1;
-    let mut routes: Vec<Vec<(u32, usize)>> =
-        list[0].iter().map(|v| vec![(*v, 0)] ).collect();
+    let mut routes: Vec<Vec<(u32, usize)>> = list[0]
+        .iter()
+        .map(|v| vec![(*v, 0)] )
+        .collect();
 
     loop {
         for route_index in 0..routes.len() {
@@ -127,9 +129,12 @@ fn problem_61() -> u32 {
     }
 
     // Test if there's a route that's circular
-    for r in &routes {
-        if digit_match(&r[5].0, &r[0].0) {
-            return r.iter().map(|(n, _)| n).sum::<u32>()
+    for route in &routes {
+        if digit_match(&route[5].0, &route[0].0) {
+            return route
+                .iter()
+                .map(|(n, _)| n)
+                .sum::<u32>()
         }
     }
 
