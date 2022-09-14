@@ -109,10 +109,10 @@ fn problem_61() -> u32 {
 
                 for n in &list[li] {
                     if digit_match(&last_el, n) {
-                        let mut m = routes[route_index].clone();
-                        m.push((*n, li));
+                        let mut new_route = routes[route_index].clone();
+                        new_route.push((*n, li));
 
-                        routes.push(m);
+                        routes.push(new_route);
                     }
                 }
             }
