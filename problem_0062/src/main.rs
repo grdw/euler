@@ -3,6 +3,15 @@ fn main() {
     println!("The answer to problem 62 is: {}", answer);
 }
 
+// The brute force solution.
+// Simply go cube by cube, and keep state.
+// The alternative is to generate each permutation of the cube on the fly
+// and count if there are 5 of them that are cubed. The downside here is
+// that you have to test each permutation if they are cubed.
+//
+// So if you have a number like 452431232 that takes 9! variations to test
+// which are way too many. Then my dumb solution is slightly better.
+//
 fn problem_62() -> u128 {
     let result: u128;
     let mut list: Vec<Vec<u128>> = vec![];
@@ -11,8 +20,6 @@ fn problem_62() -> u128 {
 
     loop {
         let cube = start.pow(3);
-        // Detect changes in the length of the cube and drop off
-        // values from the group
         let mut r_chars: Vec<char> = cube
             .to_string()
             .chars()
@@ -45,6 +52,8 @@ fn problem_62() -> u128 {
             None => list.push(vec![cube])
         }
 
+        // Detect changes in the length of the cube and drop off
+        // values from the group
         if prev_leng < r_chars.len() {
             list.clear();
         }
