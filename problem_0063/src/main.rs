@@ -1,5 +1,6 @@
 fn main() {
-    println!("Hello, world!");
+    let answer = problem_63();
+    println!("Answer is: {}", answer);
 }
 
 fn problem_63() -> u128 {
