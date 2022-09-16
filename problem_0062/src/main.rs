@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 fn main() {
     let answer = problem_62();
     println!("The answer to problem 62 is: {}", answer);
@@ -13,56 +15,32 @@ fn main() {
 // which are way too many. Then my dumb solution is slightly better.
 //
 fn problem_62() -> u128 {
-    let result: u128;
-    let mut list: Vec<Vec<u128>> = vec![];
-    let mut start: u128 = 1;
-    let mut prev_leng: usize = 1;
+    let mut list: HashMap<String, Vec<u128>> = HashMap::new();
+    let mut n: u128 = 1;
 
     loop {
-        let cube = start.pow(3);
+        let cube = n.pow(3);
         let mut r_chars: Vec<char> = cube
             .to_string()
             .chars()
             .collect();
 
         r_chars.sort_by(|a, b| a.cmp(b)); // Sort chars
+        let key: String = r_chars.into_iter().collect();
 
-        let mut permute_list = list
-            .iter_mut()
-            .filter(|v| {
-                let mut l_chars: Vec<char> = v[0]
-                    .to_string()
-                    .chars()
-                    .collect();
+        list
+            .entry(key.clone())
+            .and_modify(|c| c.push(cube))
+            .or_insert(vec![cube]);
 
-                l_chars.sort_by(|a, b| a.cmp(b)); // Sort strings
-
-                l_chars == r_chars
-            });
-
-        match permute_list.next() {
-            Some(n) => {
-                n.push(cube);
-
-                if n.len() == 5 {
-                    result = *n.iter().min().unwrap();
-                    break;
-                }
+        if let Some(n) = list.get(&key) {
+            if n.len() == 5 {
+                return n[0]
             }
-            None => list.push(vec![cube])
         }
 
-        // Detect changes in the length of the cube and drop off
-        // values from the group
-        if prev_leng < r_chars.len() {
-            list.clear();
-        }
-
-        prev_leng = r_chars.len();
-        start += 1;
+        n += 1;
     }
-
-    result
 }
 
 #[test]
