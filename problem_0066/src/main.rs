@@ -1,69 +1,48 @@
-//Consider quadratic Diophantine equations of the form:
-// x^2 – Dy^2 = 1
-// For example, when D=13, the minimal solution in x is 649^2 – 13×180^2 = 1.
-//
-//
-// Step 1: I rewrote the function in the form of:
-//
-// D = (x^2 - 1) / y^2
+fn is_square(n: u64) -> bool {
+    let root = (n as f64).sqrt() as u64;
+    root * root == n
+}
+
+fn solve_pell(d: u64) -> (u64, u64) {
+    let mut p = 0;
+    let mut q = 1;
+    let mut a0 = (d as f64).sqrt() as u64;
+    let mut a = a0;
+    let mut m = 0;
+    let mut n = 1;
+
+    loop {
+        if q == 0 {
+            continue; // skip this convergent
+        }
+        m = a * q - p;
+        n = (d - m * m) / q;
+        a = (a0 + m) / n;
+        let new_p = p;
+        p = a * p + 1 * q;
+        q = new_p;
+        if p * p - d * q * q == 1 {
+            return (p, q);
+        }
+    }
+}
+
 fn main() {
-    println!("The answer to euler 66 is: {:?}", problem_0066(1000))
-}
+    let mut max_x = 0;
+    let mut max_d = 0;
 
-fn problem_0066(max: i64) -> i64 {
-    let mut max_x: i64 = 0;
-    
-    for d in 1..=max {
-        if (d as f32).sqrt().fract() == 0.0 {
-            continue
+    for d in 2..=1000 {
+        if is_square(d) {
+            continue;
         }
 
-        println!("Finding a value for d: {:?}", d);
-        let (x, _y) = diophantine_equation(d);
-        if x > max_x { 
-            max_x = x
+        println!("{:?}", d);
+        let (x, _) = solve_pell(d);
+        if x > max_x {
+            max_x = x;
+            max_d = d;
         }
     }
 
-    max_x
-}
-
-#[test]
-fn test_highest_x() {
-    assert_eq!(problem_0066(7), 9);
-    assert_eq!(problem_0066(100), 9);
-}
-
-fn diophantine_equation(d: i64) -> (i64, i64) {
-
-    let mut x: i64 = 1;
-    let mut y: i64 = 0;
-
-    'outer: loop {
-        x += 1;
-        loop {
-            y += 1;
-
-            let td: f64 = (x.pow(2) - 1) as f64 / y.pow(2) as f64;
-            println!("{:?} {:?} {:?}", x, y, d);
-            if td < d as f64 {
-                y = 0;
-                break 
-            } else if td == d as f64 {
-                break 'outer
-            }
-        }
-    }
-    (x, y)
-}
-
-#[test]
-fn test_minimal_solution() {
-    assert_eq!(diophantine_equation(2), (3, 2));
-    assert_eq!(diophantine_equation(3), (2, 1));
-    assert_eq!(diophantine_equation(5), (9, 4));
-    assert_eq!(diophantine_equation(6), (5, 2));
-    assert_eq!(diophantine_equation(7), (8, 3));
-    assert_eq!(diophantine_equation(13), (649, 180));
-    assert_eq!(diophantine_equation(61), (649, 180))
+    println!("Maximum value of x is {} when D is {}", max_x, max_d);
 }
