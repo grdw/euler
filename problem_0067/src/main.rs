@@ -1,8 +1,6 @@
 use std::fs;
 
 fn main() {
-    println!("Hello, world!");
-
     let t = fs::read_to_string("0067_triangle.txt").unwrap();
 
     let mut v: Vec<Vec<i128>> =
