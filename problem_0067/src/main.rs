@@ -4,9 +4,9 @@ use std::cmp;
 fn main() {
     let t = fs::read_to_string("0067_triangle.txt").unwrap();
 
-    let mut v: Vec<Vec<i128>> =
+    let mut v: Vec<Vec<i32>> =
         t.split_terminator("\n").map(|n|{
-            n.split(" ").map(|q| q.parse::<i128>().unwrap()).collect()
+            n.split(" ").map(|q| q.parse::<i32>().unwrap()).collect()
         }).collect();
 
     while v.len() > 1 {
