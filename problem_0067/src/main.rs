@@ -15,10 +15,10 @@ fn main() {
             let l = v[index].len();
 
             for j in 0..l {
-                let m = row.get(j).unwrap_or(&0) + v[index][j];
-                let n = row.get(j + 1).unwrap_or(&0) + v[index][j];
+                let m = row.get(j).unwrap_or(&0);
+                let n = row.get(j + 1).unwrap_or(&0);
 
-                v[index][j] = cmp::max(m, n);
+                v[index][j] += cmp::max(m, n);
             }
         }
     }
