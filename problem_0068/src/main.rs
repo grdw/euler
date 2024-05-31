@@ -1,5 +1,6 @@
 fn main() {
     println!("n gon ring of 3: {:?}", n_gon_ring(3, usize::MAX));
+    println!("n gon ring of 5: {:?}", n_gon_ring(5, 16));
 }
 
 fn next_perm(res: &mut Vec<u8>) {
@@ -76,6 +77,7 @@ fn n_gon_ring(x: u8, limit: usize) -> u64 {
                 m = b;
             }
         }
+
         next_perm(&mut v);
     }
 
