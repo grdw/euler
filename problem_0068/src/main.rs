@@ -1,6 +1,5 @@
-use std::{thread, time::Duration};
 fn main() {
-    println!("Hello, world! {:?}", n_gon_ring(3, 1, 6));
+    println!("n gon ring of 3: {:?}", n_gon_ring(3));
 }
 
 fn next_perm(res: &mut Vec<u8>) {
@@ -27,25 +26,32 @@ fn next_perm(res: &mut Vec<u8>) {
     }
 }
 
-fn n_gon_ring(x: usize, min: u8, max: u8) -> u64 {
+fn n_gon_ring(x: u8) -> u64 {
     let mut m = 0;
-	let mut t: Vec<u8> = (min..=max).collect();
+	let mut t: Vec<u8> = (1..=x*2).collect();
 	let mut v: Vec<u8> = t.clone();
     // This is just to test that all permutations have been checked
     t.reverse();
 
-    loop {
-        let n1 = v[0] + v[1] + v[3];
-        let n2 = v[2] + v[3] + v[4];
-        let n3 = v[1] + v[2] + v[5];
+    while v != t {
+        let mut v1 = vec![];
+        for i in 0..x {
+            let fi = i as usize;
+            let fii = (i + x) as usize;
+            let fiii = (((i + 1) % x) + x) as usize;
 
-        if n1 == n2 && n2 == n3 {
-            let mut b = 0;
-            let mut v1 = vec![
-                vec![v[0], v[1], v[3]],
-                vec![v[4], v[3], v[2]],
-                vec![v[5], v[2], v[1]]
-            ];
+            v1.push(
+                vec![
+                    v[fi],
+                    v[fii],
+                    v[fiii]
+                ]
+            );
+        }
+
+        let comp = v1[0].iter().sum();
+        if v1.iter().all(|x| x.iter().sum::<u8>() == comp) {
+            let mut ts = String::new();
 
             let min_v = v1.iter().map(|n| n[0]).min().unwrap();
             while v1[0][0] != min_v {
@@ -53,18 +59,18 @@ fn n_gon_ring(x: usize, min: u8, max: u8) -> u64 {
                 v1.insert(0, x);
             }
 
-            for (i, n) in v1.into_iter().flatten().enumerate() {
-                b += 10_u64.pow((8 - i) as u32) * (n as u64);
+            for n in v1.into_iter().flatten() {
+                let s = format!("{}", n);
+                ts.push_str(&s);
             }
+
+            let b = ts.parse::<u64>().unwrap();
 
             if b > m {
                 m = b;
             }
         }
         next_perm(&mut v);
-        if v == t {
-            break;
-        }
     }
 
     return m
@@ -72,5 +78,5 @@ fn n_gon_ring(x: usize, min: u8, max: u8) -> u64 {
 
 #[test]
 fn test_n_gon_ring() {
-    assert_eq!(n_gon_ring(3, 1, 6), 432621513)
+    assert_eq!(n_gon_ring(3), 432621513)
 }
