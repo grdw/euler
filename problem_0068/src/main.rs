@@ -31,8 +31,8 @@ fn n_gon_ring(x: u8, limit: usize) -> u64 {
     let indices = get_indices(x as usize);
 
     let mut m = 0;
-	let mut t: Vec<u8> = (1..=x*2).collect();
-	let mut v: Vec<u8> = t.clone();
+    let mut t: Vec<u8> = (1..=x*2).collect();
+    let mut v: Vec<u8> = t.clone();
     // This is just to test that all permutations have been checked
     t.reverse();
 
