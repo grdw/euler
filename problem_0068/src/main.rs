@@ -28,6 +28,8 @@ fn next_perm(res: &mut Vec<u8>) {
 }
 
 fn n_gon_ring(x: u8, limit: usize) -> u64 {
+    let indices = get_indices(x as usize);
+
     let mut m = 0;
 	let mut t: Vec<u8> = (1..=x*2).collect();
 	let mut v: Vec<u8> = t.clone();
@@ -35,37 +37,23 @@ fn n_gon_ring(x: u8, limit: usize) -> u64 {
     t.reverse();
 
     while v != t {
-        let mut v1 = vec![];
-
-        // This determines the indices of the three elements
-        // With an n-gon ring I'm counting all three outer 'extremes'
-        // as 0..x . The innards for lack of a better word will always
-        // start from x followed by the next one. The only problem is
-        // at the end where it has to wrap back around to x.
-        for i in 0..x {
-            let fi = i as usize;
-            let fii = (i + x) as usize;
-            let fiii = (((i + 1) % x) + x) as usize;
-
-            v1.push(
-                vec![
-                    v[fi],
-                    v[fii],
-                    v[fiii]
-                ]
-            );
-        }
+        let mut v1: Vec<Vec<u8>> = indices
+            .iter()
+            .map(|i| vec![v[i[0]], v[i[1]], v[i[2]]])
+            .collect();
 
         let comp = v1[0].iter().sum();
         if v1.iter().all(|x| x.iter().sum::<u8>() == comp) {
-            let mut ts = String::new();
-
+            // Rotate the groups around until the lowest value
+            // is at the top
             let min_v = v1.iter().map(|n| n[0]).min().unwrap();
             while v1[0][0] != min_v {
                 let x = v1.pop().unwrap();
                 v1.insert(0, x);
             }
 
+            // Turn it into a string
+            let mut ts = String::new();
             for n in v1.into_iter().flatten() {
                 let s = format!("{}", n);
                 ts.push_str(&s);
@@ -82,6 +70,23 @@ fn n_gon_ring(x: u8, limit: usize) -> u64 {
     }
 
     return m
+}
+
+// This determines the indices of the three elements
+// With an n-gon ring I'm counting all three outer 'extremes'
+// as 0..x . The innards for lack of a better word will always
+// start from x followed by the next one. The only problem is
+// at the end where it has to wrap back around to x.
+fn get_indices(x: usize) -> Vec<Vec<usize>> {
+    (0..x)
+        .map(|i| {
+            let fi = i as usize;
+            let fii = (i + x) as usize;
+            let fiii = (((i + 1) % x) + x) as usize;
+
+            vec![fi, fii, fiii]
+        })
+        .collect()
 }
 
 #[test]
