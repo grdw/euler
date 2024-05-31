@@ -1,5 +1,5 @@
 fn main() {
-    println!("n gon ring of 3: {:?}", n_gon_ring(3));
+    println!("n gon ring of 3: {:?}", n_gon_ring(3, usize::MAX));
 }
 
 fn next_perm(res: &mut Vec<u8>) {
@@ -26,7 +26,7 @@ fn next_perm(res: &mut Vec<u8>) {
     }
 }
 
-fn n_gon_ring(x: u8) -> u64 {
+fn n_gon_ring(x: u8, limit: usize) -> u64 {
     let mut m = 0;
 	let mut t: Vec<u8> = (1..=x*2).collect();
 	let mut v: Vec<u8> = t.clone();
@@ -35,6 +35,12 @@ fn n_gon_ring(x: u8) -> u64 {
 
     while v != t {
         let mut v1 = vec![];
+
+        // This determines the indices of the three elements
+        // With an n-gon ring I'm counting all three outer 'extremes'
+        // as 0..x . The innards for lack of a better word will always
+        // start from x followed by the next one. The only problem is
+        // at the end where it has to wrap back around to x.
         for i in 0..x {
             let fi = i as usize;
             let fii = (i + x) as usize;
@@ -66,7 +72,7 @@ fn n_gon_ring(x: u8) -> u64 {
 
             let b = ts.parse::<u64>().unwrap();
 
-            if b > m {
+            if ts.len() <= limit && b > m {
                 m = b;
             }
         }
@@ -78,5 +84,7 @@ fn n_gon_ring(x: u8) -> u64 {
 
 #[test]
 fn test_n_gon_ring() {
-    assert_eq!(n_gon_ring(3), 432621513)
+    assert_eq!(n_gon_ring(3, usize::MAX), 432621513);
+    assert_eq!(n_gon_ring(4, usize::MAX), 462723831516);
+    assert_eq!(n_gon_ring(5, 16), 6531031914842725);
 }
