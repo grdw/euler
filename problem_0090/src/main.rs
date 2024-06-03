@@ -42,12 +42,6 @@ use std::collections::HashSet;
 // 1. The 6 counts as a 6 and a 9.
 // 2. The 9 counts as a 6 and a 9.
 // 3. To make all these numbers: 1, 4, 9, 16, 25, 36, 49, 64, 81
-//
-// You need at least in both groups:
-// 0, 1, 2, 3, 4, 5, 6, 8 or
-// 0, 1, 2, 3, 4, 5, 8, 9
-// else you can't make these numbers.
-//
 
 const SQUARES: [i8; 9] = [
     1,
@@ -62,20 +56,17 @@ const SQUARES: [i8; 9] = [
 ];
 
 fn problem_90() -> usize {
-    // This can probably be done a little smarter....
     let i: Vec<i8> = (0..10).collect();
     let d1: Vec<Vec<i8>> = i.into_iter().combinations(6).collect();
-    let mut d2: Vec<Vec<i8>> = d1.clone();
-    d2.append(&mut d1.clone());
+    let mut s: HashSet<Vec<&Vec<i8>>> = HashSet::new();
 
-    let mut d3: Vec<Vec<Vec<i8>>> = d2.into_iter().combinations(2).collect();
-    let mut s: HashSet<Vec<Vec<i8>>> = HashSet::new();
-
-    while d3.len() > 0 {
-        let mut groups = d3.pop().unwrap();
-        if can_make_all_squares(&groups[0], &groups[1]) {
-            groups.sort();
-            s.insert(groups);
+    for g1 in &d1 {
+        for g2 in &d1 {
+            if can_make_all_squares(g1, g2) {
+                let mut groups = vec![g1, g2];
+                groups.sort();
+                s.insert(groups);
+            }
         }
     }
 
