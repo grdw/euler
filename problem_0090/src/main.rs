@@ -1,4 +1,5 @@
 use itertools::Itertools;
+use std::collections::HashSet;
 // https://projecteuler.net/problem=90
 // There are 2 groups of numbers with each len = 6
 // And both of these 2 groups should be able to make:
@@ -48,41 +49,107 @@ use itertools::Itertools;
 // else you can't make these numbers.
 //
 
-// This one is wrong but whatever ...
-fn problem_90() -> i64 {
-    let mut total_pos = 0;
+const SQUARES: [i8; 9] = [
+    1,
+    4,
+    9,
+    16,
+    25,
+    36,
+    49,
+    64,
+    81
+];
+
+fn problem_90() -> usize {
     // This can probably be done a little smarter....
     let i: Vec<i8> = (0..10).collect();
-    let j: Vec<i8> = (0..10).collect();
-    let mut d1: Vec<Vec<i8>> = i.into_iter().combinations(6).collect();
-    let mut d2: Vec<Vec<i8>> = j.into_iter().combinations(6).collect();
-    d1.append(&mut d2);
+    let d1: Vec<Vec<i8>> = i.into_iter().combinations(6).collect();
+    let mut d2: Vec<Vec<i8>> = d1.clone();
+    d2.append(&mut d1.clone());
 
-    let d3: Vec<Vec<Vec<i8>>> = d1.into_iter().combinations(2).collect();
+    let mut d3: Vec<Vec<Vec<i8>>> = d2.into_iter().combinations(2).collect();
+    let mut s: HashSet<Vec<Vec<i8>>> = HashSet::new();
 
-    let valid_group_1 = vec![0, 1, 2, 3, 4, 5, 6, 8];
-    let valid_group_2 = vec![0, 1, 2, 3, 4, 5, 8, 9];
-
-    for mut a in d3 {
-        let mut temp = vec![];
-        temp.append(&mut a[0]);
-        temp.append(&mut a[1]);
-
-        if temp.iter().all(|x| valid_group_1.contains(x)) {
-            total_pos += 1
-        } else if temp.iter().all(|x| valid_group_2.contains(x)) {
-            total_pos += 1
+    while d3.len() > 0 {
+        let mut groups = d3.pop().unwrap();
+        if can_make_all_squares(&groups[0], &groups[1]) {
+            groups.sort();
+            s.insert(groups);
         }
     }
 
-    total_pos
+    s.len()
+}
+
+fn can_make_all_squares(g1: &Vec<i8>, g2: &Vec<i8>) -> bool {
+    let mut combinations = vec![];
+    for x in g1 {
+        for y in g2 {
+            if x == &6 {
+                combinations.push(90 + y);
+                combinations.push(9 + y * 10);
+            }
+            if y == &6 {
+                combinations.push(90 + x);
+                combinations.push(9 + x * 10);
+            }
+            if x == &9 {
+                combinations.push(60 + y);
+                combinations.push(6 + y * 10);
+            }
+            if y == &9 {
+                combinations.push(60 + x);
+                combinations.push(6 + x * 10);
+            }
+            combinations.push(x * 10 + y);
+            combinations.push(x + y * 10);
+        }
+    }
+
+    return SQUARES.iter().all(|sq| combinations.contains(&sq))
 }
 
 fn main() {
-    println!("Hello, world!");
+    println!("The answer is {}", problem_90());
 }
 
 #[test]
 fn test_problem_90() {
     assert_eq!(problem_90(), 1217);
+}
+
+#[test]
+fn test_can_make_all_squares() {
+    assert_eq!(
+        can_make_all_squares(
+            &vec![1, 2, 3, 4, 8, 9],
+            &vec![0, 5, 6, 7, 8, 9]
+        ),
+        true
+    );
+
+    assert_eq!(
+        can_make_all_squares(
+            &vec![1, 2, 3, 4, 8, 6],
+            &vec![0, 5, 6, 7, 8, 9]
+        ),
+        true
+    );
+
+    assert_eq!(
+        can_make_all_squares(
+            &vec![0, 5, 6, 7, 8, 9],
+            &vec![1, 2, 3, 4, 8, 6]
+        ),
+        true
+    );
+
+    assert_eq!(
+        can_make_all_squares(
+            &vec![0, 5, 1, 7, 8, 9],
+            &vec![1, 2, 3, 4, 8, 9]
+        ),
+        true
+    );
 }
