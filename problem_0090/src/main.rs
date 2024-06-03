@@ -78,27 +78,27 @@ fn can_make_all_squares(g1: &Vec<i8>, g2: &Vec<i8>) -> bool {
     for x in g1 {
         for y in g2 {
             if x == &6 {
-                combinations.push(90 + y);
-                combinations.push(9 + y * 10);
+                add_to(&mut combinations, &9, y)
             }
             if y == &6 {
-                combinations.push(90 + x);
-                combinations.push(9 + x * 10);
+                add_to(&mut combinations, x, &9)
             }
             if x == &9 {
-                combinations.push(60 + y);
-                combinations.push(6 + y * 10);
+                add_to(&mut combinations, &6, y)
             }
             if y == &9 {
-                combinations.push(60 + x);
-                combinations.push(6 + x * 10);
+                add_to(&mut combinations, x, &6)
             }
-            combinations.push(x * 10 + y);
-            combinations.push(x + y * 10);
+            add_to(&mut combinations, x, y)
         }
     }
 
     return SQUARES.iter().all(|sq| combinations.contains(&sq))
+}
+
+fn add_to(comb: &mut Vec<i8>, x: &i8, y: &i8) {
+    comb.push(x * 10 + y);
+    comb.push(x + y * 10);
 }
 
 fn main() {
