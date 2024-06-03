@@ -77,18 +77,10 @@ fn can_make_all_squares(g1: &Vec<i8>, g2: &Vec<i8>) -> bool {
     let mut combinations = vec![];
     for x in g1 {
         for y in g2 {
-            if x == &6 {
-                add_to(&mut combinations, &9, y)
-            }
-            if y == &6 {
-                add_to(&mut combinations, x, &9)
-            }
-            if x == &9 {
-                add_to(&mut combinations, &6, y)
-            }
-            if y == &9 {
-                add_to(&mut combinations, x, &6)
-            }
+            if x == &6 { add_to(&mut combinations, &9, y) }
+            if y == &6 { add_to(&mut combinations, x, &9) }
+            if x == &9 { add_to(&mut combinations, &6, y) }
+            if y == &9 { add_to(&mut combinations, x, &6) }
             add_to(&mut combinations, x, y)
         }
     }
