@@ -24,6 +24,8 @@ fn sum_l(n: u32) -> u32 {
     let mut counter = 10_u32.pow(n - 1);
     let mut answer = u32::MAX;
 
+    println!("GOING FOR: {}", n);
+
     loop {
         counter += 1;
 
@@ -32,13 +34,13 @@ fn sum_l(n: u32) -> u32 {
             break;
         }
 
-        let mut v: Vec<u32> = vec![];
+        let mut pr: u32 = 1;
+        let mut sm: u32 = 0;
         for i in 0..num_length {
             let n = counter % (10_u32.pow(i + 1)) / 10_u32.pow(i);
-            v.push(n);
+            pr *= n;
+            sm += n;
         }
-        let pr: u32 = v.iter().product();
-        let sm: u32 = v.iter().sum();
 
         if pr == sm && pr < answer {
             answer = pr;
@@ -52,5 +54,5 @@ fn sum_l(n: u32) -> u32 {
 fn test_sum_group() {
     assert_eq!(sum_group(2, 2), 4);
     assert_eq!(sum_group(2, 6), 30);
-    //assert_eq!(sum_group(2, 12), 61);
+    assert_eq!(sum_group(2, 12), 61);
 }
