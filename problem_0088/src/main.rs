@@ -9,10 +9,8 @@ fn sum_group(min: u64, max: u64) -> u64 {
     let mut s: HashSet<u64> = HashSet::new();
 
     for n in min..=max {
-        let p = sum_l(n as usize);
-        if n % 100 == 0 {
-            println!("{} {}", n, p);
-        }
+        let p = sum_l(n);
+        println!("{} {}", n, p);
         s.insert(p);
     }
 
@@ -23,10 +21,10 @@ fn sum_group(min: u64, max: u64) -> u64 {
     return answer
 }
 
-fn sum_l(length: usize) -> u64 {
+fn sum_l(length: u64) -> u64 {
     let answer: u64;
     let mut stack = vec![];
-    let mut number = length as u64;
+    let mut number = length;
 
     'outer: loop {
         stack.push((0, 1, length, number, 2));
@@ -44,7 +42,7 @@ fn sum_l(length: usize) -> u64 {
                 continue
             }
 
-            if (sum + l as u64) == prod {
+            if (sum + l) == prod {
                 answer = prod;
                 break 'outer;
             }
@@ -73,4 +71,5 @@ fn test_sum_group() {
     assert_eq!(sum_group(4, 4), 8);
     assert_eq!(sum_group(2, 6), 30);
     assert_eq!(sum_group(2, 12), 61);
+    assert_eq!(sum_group(2, 12000), 7587457);
 }
