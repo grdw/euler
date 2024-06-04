@@ -4,12 +4,15 @@ fn main() {
     println!("Answer: {}", sum_group(2, 12000));
 }
 
-fn sum_group(min: u32, max: u32) -> u32 {
+fn sum_group(min: u64, max: u64) -> u64 {
     let mut answer = 0;
-    let mut s: HashSet<u32> = HashSet::new();
+    let mut s: HashSet<u64> = HashSet::new();
 
     for n in min..=max {
-        let p = sum_l(n);
+        let p = sum_l(n as usize);
+        if n % 100 == 0 {
+            println!("{} {}", n, p);
+        }
         s.insert(p);
     }
 
@@ -20,39 +23,54 @@ fn sum_group(min: u32, max: u32) -> u32 {
     return answer
 }
 
-fn sum_l(n: u32) -> u32 {
-    let mut counter = 10_u32.pow(n - 1);
-    let mut answer = u32::MAX;
+fn sum_l(length: usize) -> u64 {
+    let answer: u64;
+    let mut stack = vec![];
+    let mut number = length as u64;
 
-    println!("GOING FOR: {}", n);
+    'outer: loop {
+        stack.push((0, 1, length, number, 2));
 
-    loop {
-        counter += 1;
+        while let Some((sum, prod, l, r, start)) = stack.pop() {
+            let mut i = start;
+            while i * i <= r {
+                if r % i == 0 {
+                    stack.push((sum + i, prod * i, l - 1, r / i, i));
+                }
+                i += 1;
+            }
 
-        let num_length = ((counter as f64).log10() + 1.0).floor() as u32;
-        if num_length == n + 1 {
-            break;
+            if sum == 0 || prod == 0 {
+                continue
+            }
+
+            if (sum + l as u64) == prod {
+                answer = prod;
+                break 'outer;
+            }
         }
 
-        let mut pr: u32 = 1;
-        let mut sm: u32 = 0;
-        for i in 0..num_length {
-            let n = counter % (10_u32.pow(i + 1)) / 10_u32.pow(i);
-            pr *= n;
-            sm += n;
-        }
-
-        if pr == sm && pr < answer {
-            answer = pr;
-        }
+        number += 1;
     }
 
-    return answer
+    answer
+}
+
+#[test]
+fn test_sum_l() {
+    assert_eq!(sum_l(2), 4);
+    assert_eq!(sum_l(3), 6);
+    assert_eq!(sum_l(4), 8);
+    assert_eq!(sum_l(5), 8);
+    assert_eq!(sum_l(6), 12);
+    assert_eq!(sum_l(10), 16);
+    assert_eq!(sum_l(12000), 12096);
 }
 
 #[test]
 fn test_sum_group() {
     assert_eq!(sum_group(2, 2), 4);
+    assert_eq!(sum_group(4, 4), 8);
     assert_eq!(sum_group(2, 6), 30);
     assert_eq!(sum_group(2, 12), 61);
 }
