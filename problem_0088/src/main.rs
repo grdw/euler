@@ -1,5 +1,5 @@
 use std::{thread, time::Duration};
-use std::collections::HashSet;
+use std::collections::{HashSet, HashMap};
 
 fn main() {
     println!("Answer: {}", sum_group(2, 12000));
@@ -22,13 +22,17 @@ fn is_prime(number: u64) -> bool {
     is_prime
 }
 
-fn prime_factors(mut number: u64) -> Vec<u64> {
+fn prime_factors(mut number: u64) -> HashMap<u64, u64> {
     let mut factor: u64 = 2;
-    let mut factors = vec![];
+    let mut factors = HashMap::new();
 
     while number > 1 {
         if is_prime(factor) && number % factor == 0 {
-            factors.push(factor);
+            factors
+                .entry(factor)
+                .and_modify(|n| *n += 1)
+                .or_insert(1);
+
             number /= factor
         } else {
             factor += 1
@@ -38,88 +42,78 @@ fn prime_factors(mut number: u64) -> Vec<u64> {
     factors
 }
 
-fn dfs(nums: &Vec<u64>, i: usize, res: &mut HashSet<Vec<u64>>, subset: &mut Vec<u64>) {
-    if i == nums.len() {
-        if subset.len() > 1 {
-            res.insert(subset.clone());
-        }
-        return;
+fn factor_groups(p: &HashMap<u64, u64>, h: &mut u64, k: u64) {
+    let mut t = 0;
+    let mut pr = 1;
+    let mut sm = 0;
+
+    for (key, value) in p {
+        pr *= key.pow(*value as u32);
+        sm += key * value;
+        t += value;
     }
-    subset.push(nums[i]);
-    dfs(nums, i + 1, res, subset);
-    subset.pop();
-    dfs(nums, i + 1, res, subset);
-}
 
-fn factor_groups(p: &Vec<u64>) -> HashSet<Vec<u64>> {
-    let mut n = HashSet::new();
-    let mut subset = vec![];
+    sm += k - t;
 
-    dfs(p, 0, &mut n, &mut subset);
-    println!("{:?}", n);
-
-    return n;
+    if pr == sm {
+        *h = pr
+    } else if t > 2 {
+        let mut v: Vec<u64> = vec![];
+        for (key, value) in p {
+            let m = vec![key; *value as usize];
+            v.extend(m);
+        }
+        for n in 0..v.len() {
+            for m in (n + 1)..v.len() {
+                let mut pc = p.clone();
+                let left = v[n];
+                let right = v[m];
+                pc.entry(left).and_modify(|n| *n -= 1);
+                pc.entry(right).and_modify(|n| *n -= 1);
+                pc.entry(left * right).and_modify(|n| *n += 1).or_insert(1);
+                println!("{:?}", pc);
+                factor_groups(&pc, h, k);
+            }
+        }
+    }
 }
 
 #[test]
 fn test_factor_groups() {
-    let l = vec![2,7,3,11,5];
-    let answer = HashSet::from([
-        // Full set
-        vec![2,7,3,11,5],
-        // 4 combo's:
-        vec![14,3,11,5],
-        vec![7,6,11,5],
-        vec![7,3,22,5],
-        vec![7,3,11,10],
-        vec![2,21,11,5],
-        vec![2,3,77,5],
-        vec![2,3,11,35],
-        vec![2,7,33,5],
-        vec![2,7,11,15],
-        vec![2,7,3,55],
-        // 3 combo's:
-        vec![42, 11, 5],
-        // 2 combo's:
-    ]);
-    assert_eq!(factor_groups(&l), answer);
-    let m = vec![2,2,3,5];
-    let answer = HashSet::from([
-        vec![2,2,3,5],
-        vec![2,2,15],
-        vec![2,6,5],
-        vec![2,30],
-        vec![60],
-    ]);
-    assert_eq!(factor_groups(&m), answer);
+    let mut s = 0;
+    factor_groups(&prime_factors(4), &mut s, 2);
+    assert_eq!(s, 4);
+
+    let mut s = 0;
+    factor_groups(&prime_factors(12), &mut s, 6);
+    assert_eq!(s, 12);
+
+    let mut s = 0;
+    factor_groups(&prime_factors(11), &mut s, 6);
+    assert_eq!(s, 0);
 }
 
 fn sum_group(min: u64, max: u64) -> u64 {
     let mut answer = 0;
     let mut s: HashSet<u64> = HashSet::new();
 
-    let mut q = 2;
+    let mut q = min;
     let mut k = min;
 
     'outer: loop {
-        //thread::sleep(Duration::from_millis(1000));
         let p = prime_factors(q);
+        let mut hh = 0;
+        println!("{}", q);
+        factor_groups(&p, &mut hh, k);
 
-        for g in factor_groups(&p) {
-            //println!("{} {:?}", k, g);
-            let n = k - g.len() as u64; // this is how many 1's we need to add
-            let pr: u64 = g.iter().product();
-            let sm: u64 = g.iter().sum::<u64>() + n;
+        if hh > 0 {
+            println!("bingo!");
+            k += 1;
+            s.insert(hh);
+        }
 
-            if pr == sm {
-                println!("bingo!");
-                k += 1;
-                s.insert(pr);
-
-                if k == max + 1 {
-                    break 'outer
-                }
-            }
+        if k == max + 1 {
+            break 'outer
         }
 
         q += 1;
@@ -134,11 +128,11 @@ fn sum_group(min: u64, max: u64) -> u64 {
 
 #[test]
 fn test_sum_group() {
-    //assert_eq!(sum_group(2, 2), 4);
-    //assert_eq!(sum_group(3, 3), 6);
-    //assert_eq!(sum_group(4, 4), 8);
-    //assert_eq!(sum_group(5, 5), 8);
-    //assert_eq!(sum_group(6, 6), 12);
+    assert_eq!(sum_group(2, 2), 4);
+    assert_eq!(sum_group(3, 3), 6);
+    assert_eq!(sum_group(4, 4), 8);
+    assert_eq!(sum_group(5, 5), 8);
+    assert_eq!(sum_group(6, 6), 12);
     assert_eq!(sum_group(10, 10), 16);
     //assert_eq!(sum_group(12000, 12000), 12096);
     //assert_eq!(sum_group(2, 6), 30);
