@@ -59,11 +59,11 @@ fn get_multiplication_partitions(n: u64, k: u64) -> bool {
 
 #[test]
 fn test_multiplication_partitions() {
-    //assert_eq!(get_multiplication_partitions(3, 2), false);
-    //assert_eq!(get_multiplication_partitions(4, 2), true);
-    //assert_eq!(get_multiplication_partitions(12, 6), true);
+    assert_eq!(get_multiplication_partitions(3, 2), false);
+    assert_eq!(get_multiplication_partitions(4, 2), true);
+    assert_eq!(get_multiplication_partitions(12, 6), true);
     assert_eq!(get_multiplication_partitions(8, 5), true);
-    //assert_eq!(get_multiplication_partitions(12096, 12000), true);
+    assert_eq!(get_multiplication_partitions(12096, 12000), true);
 }
 
 fn sum_group(min: u64, max: u64) -> u64 {
