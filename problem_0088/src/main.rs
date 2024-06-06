@@ -1,119 +1,59 @@
-use std::{thread, time::Duration};
-use std::collections::{HashSet, HashMap};
+use std::collections::HashSet;
 
 fn main() {
     println!("Answer: {}", sum_group(2, 12000));
 }
 
-fn is_prime(number: u64) -> bool {
-    if number < 2 {
-        return false
-    }
+fn get_multiplication_partitions(n: u64, k: u64) -> bool {
+    let mut found = false;
 
-    let mut is_prime: bool = true;
-    let end = (number as f64).sqrt().floor() as u64;
+    fn partitions(m: u64, n: u64, start: u64, k: u64, s: u64, p: u64, t: &mut bool) {
+        for i in start..=n {
+            if n % i == 0 && i > 1 {
+                let pp = p * i;
+                let ss = s + i + k;
 
-    for i in 2..end+1 {
-        if number % i == 0 {
-            is_prime = false;
-            break
-        }
-    }
-    is_prime
-}
+                if ss == pp && m == pp {
+                    *t = true;
+                }
 
-fn prime_factors(mut number: u64) -> HashMap<u64, u64> {
-    let mut factor: u64 = 2;
-    let mut factors = HashMap::new();
-
-    while number > 1 {
-        if is_prime(factor) && number % factor == 0 {
-            factors
-                .entry(factor)
-                .and_modify(|n| *n += 1)
-                .or_insert(1);
-
-            number /= factor
-        } else {
-            factor += 1
-        }
-    }
-
-    factors
-}
-
-fn factor_groups(p: &HashMap<u64, u64>, h: &mut u64, k: u64) {
-    let mut t = 0;
-    let mut pr = 1;
-    let mut sm = 0;
-
-    for (key, value) in p {
-        pr *= key.pow(*value as u32);
-        sm += key * value;
-        t += value;
-    }
-
-    sm += k - t;
-
-    if pr == sm {
-        *h = pr
-    } else if t > 2 {
-        let mut v: Vec<u64> = vec![];
-        for (key, value) in p {
-            let m = vec![key; *value as usize];
-            v.extend(m);
-        }
-        for n in 0..v.len() {
-            for m in (n + 1)..v.len() {
-                let mut pc = p.clone();
-                let left = v[n];
-                let right = v[m];
-                pc.entry(left).and_modify(|n| *n -= 1);
-                pc.entry(right).and_modify(|n| *n -= 1);
-                pc.entry(left * right).and_modify(|n| *n += 1).or_insert(1);
-                println!("{:?}", pc);
-                factor_groups(&pc, h, k);
+                if k > 0 {
+                    partitions(m, n / i, i, k - 1, s + i, p * i, t);
+                }
             }
         }
     }
+
+    partitions(n, n, 2, k - 1, 0, 1, &mut found);
+    return found
 }
 
 #[test]
-fn test_factor_groups() {
-    let mut s = 0;
-    factor_groups(&prime_factors(4), &mut s, 2);
-    assert_eq!(s, 4);
-
-    let mut s = 0;
-    factor_groups(&prime_factors(12), &mut s, 6);
-    assert_eq!(s, 12);
-
-    let mut s = 0;
-    factor_groups(&prime_factors(11), &mut s, 6);
-    assert_eq!(s, 0);
+fn test_multiplication_partitions() {
+    assert_eq!(get_multiplication_partitions(3, 2), false);
+    assert_eq!(get_multiplication_partitions(4, 2), true);
+    assert_eq!(get_multiplication_partitions(12, 6), true);
+    assert_eq!(get_multiplication_partitions(8, 5), true);
 }
 
 fn sum_group(min: u64, max: u64) -> u64 {
     let mut answer = 0;
-    let mut s: HashSet<u64> = HashSet::new();
-
     let mut q = min;
     let mut k = min;
+    let mut s: HashSet<u64> = HashSet::new();
 
-    'outer: loop {
-        let p = prime_factors(q);
-        let mut hh = 0;
-        println!("{}", q);
-        factor_groups(&p, &mut hh, k);
-
-        if hh > 0 {
-            println!("bingo!");
+    loop {
+        if get_multiplication_partitions(q, k) {
             k += 1;
-            s.insert(hh);
+            if k % 100 == 0 {
+                println!("at k = {}", k);
+            }
+            s.insert(q);
+            q = min;
         }
 
         if k == max + 1 {
-            break 'outer
+            break;
         }
 
         q += 1;
@@ -131,11 +71,12 @@ fn test_sum_group() {
     assert_eq!(sum_group(2, 2), 4);
     assert_eq!(sum_group(3, 3), 6);
     assert_eq!(sum_group(4, 4), 8);
-    assert_eq!(sum_group(5, 5), 8);
+    assert_eq!(sum_group(4, 5), 8);
     assert_eq!(sum_group(6, 6), 12);
     assert_eq!(sum_group(10, 10), 16);
-    //assert_eq!(sum_group(12000, 12000), 12096);
-    //assert_eq!(sum_group(2, 6), 30);
-    //assert_eq!(sum_group(2, 12), 61);
+    assert_eq!(sum_group(12, 12), 16);
+    assert_eq!(sum_group(12000, 12000), 12096);
+    assert_eq!(sum_group(2, 6), 30);
+    assert_eq!(sum_group(2, 12), 61);
     //assert_eq!(sum_group(2, 12000), 7587457);
 }
