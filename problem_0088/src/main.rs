@@ -12,14 +12,16 @@ fn main() {
 // The loop starts at 2 till 8. It checks which of these number are
 // divisible by 8. Which will be 2 and 4.
 //
-// The product will be determined which 1 * 2 = 2 and 1 * 4 = 4.
-// The sum will be 0 + 2 = 2 and 0 + 4 = 4.
+// The product will be determined which means for depth=1:
+// - 1 * 2 = 2 and
+// - 1 * 4 = 4.
+// Their respective sums will be 0 + 2 = 2 and 0 + 4 = 4.
 // The group size in this example, as specified is, 4. This means that the
 // factors will look like [2] and [4] but the rest will be all 1's.
 // For the product there will be no changes since multiplying by 1 till Infinity
 // will always return the same number. For summing there will be a difference,
 // which is why we're counting the remainder of factors and adding that to
-// the total sum. We'll then compare as the original assignment states
+// the total sum. We'll then compare - as the original assignment states -
 // if the product and sum are equal, and if they are, return true!
 // if not we go further, and recursively check the rest of the factors which
 // in the case of 8 will look like:
@@ -35,7 +37,7 @@ fn main() {
 // 1 is not counted which is why that i > 1 is there.
 // For [4,2,1,1] or [4,2] (+2 for summation). The product and sum match to 8.
 //
-fn get_multiplication_partitions(n: u64, k: u64) -> bool {
+fn valid_product_sum(n: u64, k: u64) -> bool {
     fn partitions(n: u64, start: u64, k: u64, s: u64, p: u64) -> bool {
         for i in start..=n {
             if n % i == 0 && i > 1 {
@@ -59,11 +61,11 @@ fn get_multiplication_partitions(n: u64, k: u64) -> bool {
 
 #[test]
 fn test_multiplication_partitions() {
-    assert_eq!(get_multiplication_partitions(3, 2), false);
-    assert_eq!(get_multiplication_partitions(4, 2), true);
-    assert_eq!(get_multiplication_partitions(12, 6), true);
-    assert_eq!(get_multiplication_partitions(8, 5), true);
-    assert_eq!(get_multiplication_partitions(12096, 12000), true);
+    assert_eq!(valid_product_sum(3, 2), false);
+    assert_eq!(valid_product_sum(4, 2), true);
+    assert_eq!(valid_product_sum(12, 6), true);
+    assert_eq!(valid_product_sum(8, 5), true);
+    assert_eq!(valid_product_sum(12096, 12000), true);
 }
 
 fn sum_group(min: u64, max: u64) -> u64 {
@@ -73,7 +75,7 @@ fn sum_group(min: u64, max: u64) -> u64 {
     let mut s: HashSet<u64> = HashSet::new();
 
     while k <= max {
-        if get_multiplication_partitions(q, k) {
+        if valid_product_sum(q, k) {
             k += 1;
             s.insert(q);
             q = k;
