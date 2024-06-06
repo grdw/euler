@@ -33,6 +33,7 @@ fn main() {
 //       2
 //
 // 1 is not counted which is why that i > 1 is there.
+// For [4,2,1,1] or [4,2] (+2 for summation). The product and sum match to 8.
 //
 fn get_multiplication_partitions(n: u64, k: u64) -> bool {
     fn partitions(n: u64, start: u64, k: u64, s: u64, p: u64) -> bool {
