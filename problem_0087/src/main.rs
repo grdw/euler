@@ -4,17 +4,25 @@ const MAX: u64 = 50_000_000;
 
 fn main() {
     let mut count = HashSet::new();
+    let mut n = 0;
+    let l = list_primes(2);
+    let k = list_primes(3);
+    let m = list_primes(4);
+    let max: usize = l.len() * k.len() * m.len();
 
-    for x in &list_primes(2) {
-        for y in &list_primes(3) {
-            for z in &list_primes(4) {
-                let n = x.pow(2) + y.pow(3) + z.pow(4);
-                if n < MAX {
-                    count.insert(n);
-                }
-            }
+    while n < max {
+        let li = n % l.len();
+        let ki = (n / l.len()) % k.len();
+        let mi = (n / l.len() / k.len()) % m.len();
+        let qq = l[li].pow(2) + k[ki].pow(3) + m[mi].pow(4);
+
+        if qq < MAX {
+            count.insert(qq);
         }
+
+        n += 1;
     }
+
     println!("Answer: {:?}", count.len());
 }
 
