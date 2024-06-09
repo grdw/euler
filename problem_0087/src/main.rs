@@ -3,12 +3,11 @@ use std::collections::HashSet;
 const MAX: u64 = 50_000_000;
 
 fn main() {
-    let primes = list_primes();
     let mut count = HashSet::new();
 
-    for x in &primes {
-        for y in &primes {
-            for z in &primes {
+    for x in &list_primes(2) {
+        for y in &list_primes(3) {
+            for z in &list_primes(4) {
                 let n = x.pow(2) + y.pow(3) + z.pow(4);
                 if n < MAX {
                     count.insert(n);
@@ -36,10 +35,10 @@ fn is_prime(number: u64) -> bool {
     is_prime
 }
 
-fn list_primes() -> Vec<u64> {
+fn list_primes(p: u32) -> Vec<u64> {
     let mut n: u64 = 2;
     let mut list = vec![];
-    while n.pow(2) < MAX {
+    while n.pow(p) < MAX {
         if is_prime(n) {
             list.push(n);
         }
