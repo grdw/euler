@@ -1,5 +1,13 @@
 // https://projecteuler.net/problem=758
 //
+// For large numbers this is really bad. It will be slow as shit because
+// that HashSet will grow to infinite and beyond. The fix I guess is to either
+// make that HashSet smarter.
+// The thing I do see is that there are clear repeating patterns as to how
+// to pour the most efficient. But how many repeating patterns are there and
+// will they always be there?
+//
+use std::fs;
 use std::cmp;
 use std::collections::{VecDeque, HashSet};
 
@@ -10,10 +18,30 @@ fn main() {
     println!("Answer: {}", pour_for_primes());
 }
 
+struct Fold {
+    buckets: [u64; 3],
+    depth: u64,
+    history: String
+}
+
+impl Fold {
+    pub fn init(buckets: [u64; 3]) -> Fold {
+        Fold {
+            buckets,
+            depth: 0,
+            history: String::new()
+        }
+    }
+}
+
+struct Pattern {
+
+}
+
 fn pour_for_primes() -> u64 {
     let p = range_of_primes();
     let mut total = 0;
-    for i in 0..3 {
+    for i in 0..2 {
         println!("=================");
         for j in i+1..4 {
             let s = 2 * p[i].pow(5) - 1;
@@ -56,25 +84,6 @@ fn range_of_primes() -> Vec<u64> {
     result
 }
 
-struct Fold {
-    buckets: [u64; 3],
-    depth: u64,
-    history: Vec<(char, char)>
-}
-
-// Thought process:
-// I'm starting at depth 2 assume I did 2 moves already: M -> L, S -> M
-// The reason for that is that I believe all the examples start out like this
-impl Fold {
-    pub fn init(buckets: [u64; 3]) -> Fold {
-        Fold {
-            buckets,
-            depth: 0,
-            history: vec![]
-        }
-    }
-}
-
 fn pour_one_litre(s: u64, m: u64) -> u64 {
     let mut answer = 0;
     let l = s + m;
@@ -94,11 +103,7 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
 
     while let Some(fold) = current.pop_front() {
         if fold.buckets.iter().any(|v| *v == 1) {
-            for (i, (k, v)) in fold.history.iter().enumerate() {
-                if i < 100 {
-                    print!("{}{}-", k, v);
-                }
-            }
+            fs::write(format!("{}-{}-{}.csv", s, m, l), fold.history).unwrap();
             println!("");
             answer = fold.depth;
             break
@@ -118,7 +123,17 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
             edit[*to] += pour;
 
             let mut h = fold.history.clone();
-            h.push((BUCKETNAMES[*from], BUCKETNAMES[*to]));
+            h.push_str(
+                &format!(
+                    "{},{},{},{},{}\n",
+                    BUCKETNAMES[*from],
+                    BUCKETNAMES[*to],
+                    edit[0],
+                    edit[1],
+                    edit[2]
+                )
+            );
+
             current.push_back(
                 Fold {
                     buckets: edit,
