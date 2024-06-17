@@ -1,7 +1,10 @@
 // https://projecteuler.net/problem=758
 //
 use std::cmp;
-use std::collections::{HashSet, HashMap, VecDeque};
+use std::collections::{VecDeque, HashSet};
+
+// For debugging
+const BUCKETNAMES: [char; 3] = ['S', 'M', 'L'];
 
 fn main() {
     println!("Answer: {}", pour_for_primes());
@@ -10,13 +13,15 @@ fn main() {
 fn pour_for_primes() -> u64 {
     let p = range_of_primes();
     let mut total = 0;
-    for i in 0..p.len() {
+    for i in 0..3 {
         println!("=================");
-        for j in i+1..p.len() {
-            //let s = 2 * p[i].pow(5) - 1;
-            //let m = 2 * p[j].pow(5) - 1;
-            println!("{}", pour_one_litre(p[i], p[j]));
-            //total += pour_one_litre(s, m);
+        for j in i+1..4 {
+            let s = 2 * p[i].pow(5) - 1;
+            let m = 2 * p[j].pow(5) - 1;
+            let l = pour_one_litre(s, m);
+            println!("{} {} P: {}", s, m, l);
+
+            total += l;
         }
     }
     return total
@@ -54,20 +59,21 @@ fn range_of_primes() -> Vec<u64> {
 struct Fold {
     buckets: [u64; 3],
     depth: u64,
-    previous_pours: [(usize, usize); 3],
+    history: Vec<(char, char)>
 }
 
+// Thought process:
+// I'm starting at depth 2 assume I did 2 moves already: M -> L, S -> M
+// The reason for that is that I believe all the examples start out like this
 impl Fold {
     pub fn init(buckets: [u64; 3]) -> Fold {
         Fold {
             buckets,
             depth: 0,
-            previous_pours: [(0, 0); 3]
+            history: vec![]
         }
     }
 }
-
-const BUCKETNAMES: [char; 3] = ['S', 'M', 'L'];
 
 fn pour_one_litre(s: u64, m: u64) -> u64 {
     let mut answer = 0;
@@ -83,20 +89,26 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
 
     let caps = [s, m, l];
     let buckets = [s, m, 0];
+    let mut h = HashSet::new();
     let mut current = VecDeque::from([Fold::init(buckets)]);
 
     while let Some(fold) = current.pop_front() {
         if fold.buckets.iter().any(|v| *v == 1) {
+            for (i, (k, v)) in fold.history.iter().enumerate() {
+                if i < 100 {
+                    print!("{}{}-", k, v);
+                }
+            }
+            println!("");
             answer = fold.depth;
             break
         }
 
+        if h.contains(&fold.buckets) {
+            continue
+        }
+
         for (from, to) in &pours {
-            if fold.previous_pours
-                .iter()
-                .any(|(pf, pt)| pf == to && pt == from ) {
-                continue
-            }
             if fold.buckets[*from] == 0 { continue }
             if fold.buckets[*to] == caps[*to] { continue }
 
@@ -104,20 +116,19 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
             let mut edit = fold.buckets;
             edit[*from] -= pour;
             edit[*to] += pour;
-            //print!("{} -> {} -> {}", BUCKETNAMES[*from], pour, BUCKETNAMES[*to]);
-            //println!(" {:?} {} HISTORY: {:?}", edit, fold.depth, fold.previous_pours);
 
-            let mut previous_pours = fold.previous_pours;
-            previous_pours[fold.depth as usize % previous_pours.len()] = (*from, *to);
-
+            let mut h = fold.history.clone();
+            h.push((BUCKETNAMES[*from], BUCKETNAMES[*to]));
             current.push_back(
                 Fold {
                     buckets: edit,
                     depth: fold.depth + 1,
-                    previous_pours,
+                    history: h
                 }
             );
         }
+
+        h.insert(fold.buckets);
     }
 
     return answer
@@ -126,12 +137,8 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
 #[test]
 fn test_pour_one_litre() {
     assert_eq!(pour_one_litre(3, 5), 4);
-    //assert_eq!(pour_one_litre(5, 7), 8);
-    //assert_eq!(pour_one_litre(7, 9), 12);
-    //assert_eq!(pour_one_litre(5, 29), 12);
-    //assert_eq!(pour_one_litre(7, 31), 20);
-    //assert_eq!(pour_one_litre(1234, 4321), 2780);
-    //assert_eq!(pour_one_litre((991 * 2) - 1, (997 * 2) - 1), 660);
-    //assert_eq!(pour_one_litre((991_u64.pow(2) * 2) - 1, (997_u64.pow(2) * 2) - 1), 619928);
-    //assert_eq!(pour_one_litre(1911605485491901, 1970179460809513), 2780);
+    assert_eq!(pour_one_litre(7, 31), 20);
+    assert_eq!(pour_one_litre(1234, 4321), 2780);
+    // Slow example
+    assert_eq!(pour_one_litre(1964161, 1988017), 619928);
 }
