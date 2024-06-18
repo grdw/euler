@@ -130,6 +130,7 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
                    let t_div = caps[1] / caps[0];
                    let div = buckets[2] / caps[0];
                    let wl = buckets[2] - (caps[0] * div);
+                   println!("{}", div);
                    strat_answer += (t_div * 2) + 2;
 
                    buckets[0] = caps[2] - caps[1] - wl;
@@ -166,6 +167,69 @@ fn pour(buckets: &mut [u64; 3], caps: [u64; 3], i: usize, j: usize) {
     buckets[j] += pour;
 }
 
+fn pour_one_litre_bfs(s: u64, m: u64) -> u64 {
+    let mut answer = 0;
+    let l = s + m;
+    let pours: Vec<(usize, usize)> = vec![
+        (0, 2),
+        (0, 1),
+        (1, 2),
+        (1, 0),
+        (2, 0),
+        (2, 1)
+    ];
+    let caps = [s, m, l];
+    let buckets = [s, m, 0];
+    let mut h = HashSet::new();
+    let mut current = VecDeque::from([Fold::init(buckets)]);
+
+    while let Some(fold) = current.pop_front() {
+        if fold.buckets.iter().any(|v| *v == 1) {
+            fs::write(format!("{}-{}-{}.csv", s, m, l), fold.history).unwrap();
+            println!("");
+            answer = fold.depth;
+            break
+        }
+
+        if h.contains(&fold.buckets) {
+            continue
+        }
+
+        for (from, to) in &pours {
+            if fold.buckets[*from] == 0 { continue }
+            if fold.buckets[*to] == caps[*to] { continue }
+
+            let pour = cmp::min(fold.buckets[*from], caps[*to] - fold.buckets[*to]);
+            let mut edit = fold.buckets;
+            edit[*from] -= pour;
+            edit[*to] += pour;
+
+            let mut h = fold.history.clone();
+            h.push_str(
+                &format!(
+                    "{},{},{},{},{}\n",
+                    BUCKETNAMES[*from],
+                    BUCKETNAMES[*to],
+                    edit[0],
+                    edit[1],
+                    edit[2]
+                )
+            );
+
+            current.push_back(
+                Fold {
+                    buckets: edit,
+                    depth: fold.depth + 1,
+                    history: h
+                }
+            );
+        }
+
+        h.insert(fold.buckets);
+    }
+    return answer
+}
+
 #[test]
 fn test_pour_one_litre_a() {
     assert_eq!(pour_one_litre(3, 5), 4);
@@ -173,6 +237,7 @@ fn test_pour_one_litre_a() {
 
 #[test]
 fn test_pour_one_litre_b() {
+    //let _a = pour_one_litre_bfs(7, 31);
     assert_eq!(pour_one_litre(7, 31), 20);
 }
 
