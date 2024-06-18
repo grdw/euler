@@ -237,7 +237,6 @@ fn test_pour_one_litre_b() {
 
 #[test]
 fn test_pour_one_litre_c() {
-    let _a = pour_one_litre_bfs(1234, 4321);
     assert_eq!(pour_one_litre(1234, 4321), 2780);
 }
 
