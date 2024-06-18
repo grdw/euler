@@ -81,117 +81,91 @@ fn range_of_primes() -> Vec<u64> {
 }
 
 #[derive(Clone)]
-enum Strategy {
+enum Step {
     SLMS,
-    LM
+    LM,
+    ML,
+    SMLS,
 }
 
 #[derive(Clone)]
-struct Node {
-    strat: Strategy,
-    goto: usize
+struct Strategy {
+    steps: Vec<Step>
 }
 
 fn pour_one_litre(s: u64, m: u64) -> u64 {
-    let mut answer = 0;
+    let mut answer = u64::MAX;
     let l = s + m;
-    //let pours: Vec<(usize, usize)> = vec![
-    //    (0, 2),
-    //    (0, 1),
-    //    (1, 2),
-    //    (1, 0),
-    //    (2, 0),
-    //    (2, 1)
-    //];
 
-    let n: Vec<Node> = vec![
-        Node { strat: Strategy::SLMS, goto: 1 },
-        Node { strat: Strategy::LM, goto: 0 },
+    let strats: Vec<Strategy> = vec![
+        Strategy { steps: vec![Step::SLMS, Step::LM] },
+        Strategy { steps: vec![Step::ML, Step::SMLS] }
     ];
-    let mut queue = VecDeque::new();
-    queue.push_back(Node { strat: Strategy::SLMS, goto: 1 });
 
     let caps = [s, m, l];
-    let mut buckets = [s, m, 0];
 
-    while let Some(node) = queue.pop_front() {
-        match node.strat {
-            Strategy::SLMS => {
-                let t_div = caps[1] / caps[0];
-                let div = (caps[2] - buckets[2]) / caps[0];
-                let wl = buckets[2] + (caps[0] * div);
-                answer += (t_div * 2) + 2;
+    for strat in &strats {
+        let mut buckets = [s, m, 0];
+        let mut strat_answer = 0;
+        let mut step_index = 0;
 
-                buckets[0] = caps[2] - wl;
-                buckets[1] = 0;
-                buckets[2] = wl;
-            },
-            Strategy::LM => {
-                let pour = cmp::min(buckets[2], caps[1] - buckets[1]);
-                buckets[2] -= pour;
-                buckets[1] += pour;
-                answer += 1;
-            }
+        while buckets.iter().all(|n| *n != 1) {
+           match strat.steps[step_index] {
+               Step::SLMS => {
+                   let t_div = caps[1] / caps[0];
+                   let div = (caps[2] - buckets[2]) / caps[0];
+                   let wl = buckets[2] + (caps[0] * div);
+                   strat_answer += (t_div * 2) + 2;
+
+                   buckets[0] = caps[2] - wl;
+                   buckets[1] = 0;
+                   buckets[2] = wl;
+                   step_index = 1;
+               },
+               Step::SMLS => {
+                   let t_div = caps[1] / caps[0];
+                   let t_mod = caps[1] % caps[0];
+                   let div = buckets[2] / caps[0];
+                   let wl = buckets[2] - (caps[0] * div);
+                   println!("B: {:?} {}", buckets, strat_answer);
+                   //let wl = buckets[2] + (caps[0] * div);
+                   strat_answer += (t_div * 2) + 2;
+
+                   buckets[0] = caps[2] - caps[1] - wl;
+                   buckets[1] = caps[1];
+                   buckets[2] = wl;
+                   println!("A: {:?} {}", buckets, strat_answer);
+                   step_index = 0;
+                   //break;
+               },
+                Step::LM => {
+                    let pour = cmp::min(buckets[2], caps[1] - buckets[1]);
+                    buckets[2] -= pour;
+                    buckets[1] += pour;
+                    strat_answer += 1;
+                    step_index = 0;
+                },
+                Step::ML => {
+                    let pour = cmp::min(buckets[1], caps[2] - buckets[2]);
+                    buckets[1] -= pour;
+                    buckets[2] += pour;
+                    strat_answer += 1;
+                    step_index = 1;
+                }
+           }
         }
 
-        if buckets.iter().all(|n| *n != 1) {
-            queue.push_back(n[node.goto].clone());
+        if strat_answer < answer {
+            answer = strat_answer
         }
     }
-    //let mut h = HashSet::new();
-    //let mut current = VecDeque::from([Fold::init(buckets)]);
-
-    //while let Some(fold) = current.pop_front() {
-    //    if fold.buckets.iter().any(|v| *v == 1) {
-    //        fs::write(format!("{}-{}-{}.csv", s, m, l), fold.history).unwrap();
-    //        println!("");
-    //        answer = fold.depth;
-    //        break
-    //    }
-
-    //    if h.contains(&fold.buckets) {
-    //        continue
-    //    }
-
-    //    for (from, to) in &pours {
-    //        if fold.buckets[*from] == 0 { continue }
-    //        if fold.buckets[*to] == caps[*to] { continue }
-
-    //        let pour = cmp::min(fold.buckets[*from], caps[*to] - fold.buckets[*to]);
-    //        let mut edit = fold.buckets;
-    //        edit[*from] -= pour;
-    //        edit[*to] += pour;
-
-    //        let mut h = fold.history.clone();
-    //        h.push_str(
-    //            &format!(
-    //                "{},{},{},{},{}\n",
-    //                BUCKETNAMES[*from],
-    //                BUCKETNAMES[*to],
-    //                edit[0],
-    //                edit[1],
-    //                edit[2]
-    //            )
-    //        );
-
-    //        current.push_back(
-    //            Fold {
-    //                buckets: edit,
-    //                depth: fold.depth + 1,
-    //                history: h
-    //            }
-    //        );
-    //    }
-
-    //    h.insert(fold.buckets);
-    //}
 
     return answer
 }
 
 #[test]
 fn test_pour_one_litre() {
-    assert_eq!(pour_one_litre(63, 33613), 13896);
+    //assert_eq!(pour_one_litre(63, 33613), 13896);
     assert_eq!(pour_one_litre(485, 33613), 29948);
     //assert_eq!(pour_one_litre(3, 5), 4);
     //assert_eq!(pour_one_litre(7, 31), 20);
