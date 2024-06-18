@@ -34,10 +34,6 @@ impl Fold {
     }
 }
 
-struct Pattern {
-
-}
-
 fn pour_for_primes() -> u64 {
     let p = range_of_primes();
     let mut total = 0;
@@ -84,76 +80,122 @@ fn range_of_primes() -> Vec<u64> {
     result
 }
 
+#[derive(Clone)]
+enum Strategy {
+    SLMS,
+    LM
+}
+
+#[derive(Clone)]
+struct Node {
+    strat: Strategy,
+    goto: usize
+}
+
 fn pour_one_litre(s: u64, m: u64) -> u64 {
     let mut answer = 0;
     let l = s + m;
-    let pours: Vec<(usize, usize)> = vec![
-        (0, 2),
-        (0, 1),
-        (1, 2),
-        (1, 0),
-        (2, 0),
-        (2, 1)
+    //let pours: Vec<(usize, usize)> = vec![
+    //    (0, 2),
+    //    (0, 1),
+    //    (1, 2),
+    //    (1, 0),
+    //    (2, 0),
+    //    (2, 1)
+    //];
+
+    let n: Vec<Node> = vec![
+        Node { strat: Strategy::SLMS, goto: 1 },
+        Node { strat: Strategy::LM, goto: 0 },
     ];
+    let mut queue = VecDeque::new();
+    queue.push_back(Node { strat: Strategy::SLMS, goto: 1 });
 
     let caps = [s, m, l];
-    let buckets = [s, m, 0];
-    let mut h = HashSet::new();
-    let mut current = VecDeque::from([Fold::init(buckets)]);
+    let mut buckets = [s, m, 0];
 
-    while let Some(fold) = current.pop_front() {
-        if fold.buckets.iter().any(|v| *v == 1) {
-            fs::write(format!("{}-{}-{}.csv", s, m, l), fold.history).unwrap();
-            println!("");
-            answer = fold.depth;
-            break
+    while let Some(node) = queue.pop_front() {
+        match node.strat {
+            Strategy::SLMS => {
+                let t_div = caps[1] / caps[0];
+                let div = (caps[2] - buckets[2]) / caps[0];
+                let wl = buckets[2] + (caps[0] * div);
+                answer += (t_div * 2) + 2;
+
+                buckets[0] = caps[2] - wl;
+                buckets[1] = 0;
+                buckets[2] = wl;
+            },
+            Strategy::LM => {
+                let pour = cmp::min(buckets[2], caps[1] - buckets[1]);
+                buckets[2] -= pour;
+                buckets[1] += pour;
+                answer += 1;
+            }
         }
 
-        if h.contains(&fold.buckets) {
-            continue
+        if buckets.iter().all(|n| *n != 1) {
+            queue.push_back(n[node.goto].clone());
         }
-
-        for (from, to) in &pours {
-            if fold.buckets[*from] == 0 { continue }
-            if fold.buckets[*to] == caps[*to] { continue }
-
-            let pour = cmp::min(fold.buckets[*from], caps[*to] - fold.buckets[*to]);
-            let mut edit = fold.buckets;
-            edit[*from] -= pour;
-            edit[*to] += pour;
-
-            let mut h = fold.history.clone();
-            h.push_str(
-                &format!(
-                    "{},{},{},{},{}\n",
-                    BUCKETNAMES[*from],
-                    BUCKETNAMES[*to],
-                    edit[0],
-                    edit[1],
-                    edit[2]
-                )
-            );
-
-            current.push_back(
-                Fold {
-                    buckets: edit,
-                    depth: fold.depth + 1,
-                    history: h
-                }
-            );
-        }
-
-        h.insert(fold.buckets);
     }
+    //let mut h = HashSet::new();
+    //let mut current = VecDeque::from([Fold::init(buckets)]);
+
+    //while let Some(fold) = current.pop_front() {
+    //    if fold.buckets.iter().any(|v| *v == 1) {
+    //        fs::write(format!("{}-{}-{}.csv", s, m, l), fold.history).unwrap();
+    //        println!("");
+    //        answer = fold.depth;
+    //        break
+    //    }
+
+    //    if h.contains(&fold.buckets) {
+    //        continue
+    //    }
+
+    //    for (from, to) in &pours {
+    //        if fold.buckets[*from] == 0 { continue }
+    //        if fold.buckets[*to] == caps[*to] { continue }
+
+    //        let pour = cmp::min(fold.buckets[*from], caps[*to] - fold.buckets[*to]);
+    //        let mut edit = fold.buckets;
+    //        edit[*from] -= pour;
+    //        edit[*to] += pour;
+
+    //        let mut h = fold.history.clone();
+    //        h.push_str(
+    //            &format!(
+    //                "{},{},{},{},{}\n",
+    //                BUCKETNAMES[*from],
+    //                BUCKETNAMES[*to],
+    //                edit[0],
+    //                edit[1],
+    //                edit[2]
+    //            )
+    //        );
+
+    //        current.push_back(
+    //            Fold {
+    //                buckets: edit,
+    //                depth: fold.depth + 1,
+    //                history: h
+    //            }
+    //        );
+    //    }
+
+    //    h.insert(fold.buckets);
+    //}
 
     return answer
 }
 
 #[test]
 fn test_pour_one_litre() {
-    assert_eq!(pour_one_litre(3, 5), 4);
-    assert_eq!(pour_one_litre(7, 31), 20);
-    assert_eq!(pour_one_litre(1234, 4321), 2780);
+    assert_eq!(pour_one_litre(63, 33613), 13896);
+    assert_eq!(pour_one_litre(485, 33613), 29948);
+    //assert_eq!(pour_one_litre(3, 5), 4);
+    //assert_eq!(pour_one_litre(7, 31), 20);
+    //assert_eq!(pour_one_litre(1234, 4321), 2780);
     // Slow example
-    assert_eq!(pour_one_litre(1964161, 1988017), 619928);
+    //assert_eq!(pour_one_litre(1964161, 1988017), 619928);
 }

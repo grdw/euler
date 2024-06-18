@@ -10,8 +10,12 @@ Repeating pattern is "SM-LS-SM-LS-SM-LS-SM-LS-SM-LS-SM-LS-SM-LS-SM"
 SL-MS repeats **a lot** before one LM
 
 # [485, 6249, 6734]
-ML-SM repeats in a certain pattern for sure... but how the fuck am I supposed
+ML-SM repeats in a certain pattern for sure... but how the f am I supposed
 to figure out how it 'repeats'.
 
 # [485, 33613, 34098]
 ML-SM repeats
+
+Hmmm. I feel like there are maybe N strategies that are valid and all of them
+have a specific pattern. If I get all the strategies and execute them in an
+efficient way, than figure out which takes the least amount of pours.
