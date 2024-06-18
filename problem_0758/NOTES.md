@@ -19,3 +19,7 @@ ML-SM repeats
 Hmmm. I feel like there are maybe N strategies that are valid and all of them
 have a specific pattern. If I get all the strategies and execute them in an
 efficient way, than figure out which takes the least amount of pours.
+
+There are two strategies thusfar that I can find (unless others appear).
+- It's either a strak of [SL-MS {n}, LM]{n} or [ML, SM-LS{n}]{n}
+

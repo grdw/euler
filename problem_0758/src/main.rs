@@ -80,7 +80,7 @@ fn range_of_primes() -> Vec<u64> {
     result
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 enum Step {
     SLMS,
     LM,
@@ -110,7 +110,10 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
         let mut step_index = 0;
 
         while buckets.iter().all(|n| *n != 1) {
-           match strat.steps[step_index] {
+            let step = &strat.steps[step_index];
+            println!("B: {:?} {} {:?}", buckets, strat_answer, step);
+            match step {
+               // In this case you keep on filling L till M is empty
                Step::SLMS => {
                    let t_div = caps[1] / caps[0];
                    let div = (caps[2] - buckets[2]) / caps[0];
@@ -122,37 +125,31 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
                    buckets[2] = wl;
                    step_index = 1;
                },
+               // In this case you keep on filling M till L is empty
                Step::SMLS => {
                    let t_div = caps[1] / caps[0];
-                   let t_mod = caps[1] % caps[0];
                    let div = buckets[2] / caps[0];
                    let wl = buckets[2] - (caps[0] * div);
-                   println!("B: {:?} {}", buckets, strat_answer);
-                   //let wl = buckets[2] + (caps[0] * div);
                    strat_answer += (t_div * 2) + 2;
 
                    buckets[0] = caps[2] - caps[1] - wl;
                    buckets[1] = caps[1];
                    buckets[2] = wl;
-                   println!("A: {:?} {}", buckets, strat_answer);
                    step_index = 0;
-                   //break;
                },
                 Step::LM => {
-                    let pour = cmp::min(buckets[2], caps[1] - buckets[1]);
-                    buckets[2] -= pour;
-                    buckets[1] += pour;
+                    pour(&mut buckets, caps, 2, 1);
                     strat_answer += 1;
                     step_index = 0;
                 },
                 Step::ML => {
-                    let pour = cmp::min(buckets[1], caps[2] - buckets[2]);
-                    buckets[1] -= pour;
-                    buckets[2] += pour;
+                    pour(&mut buckets, caps, 1, 2);
                     strat_answer += 1;
                     step_index = 1;
                 }
-           }
+            }
+
+            println!("A: {:?} {}", buckets, strat_answer);
         }
 
         if strat_answer < answer {
@@ -163,13 +160,35 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
     return answer
 }
 
+fn pour(buckets: &mut [u64; 3], caps: [u64; 3], i: usize, j: usize) {
+    let pour = cmp::min(buckets[i], caps[j] - buckets[j]);
+    buckets[i] -= pour;
+    buckets[j] += pour;
+}
+
 #[test]
-fn test_pour_one_litre() {
-    //assert_eq!(pour_one_litre(63, 33613), 13896);
+fn test_pour_one_litre_a() {
+    assert_eq!(pour_one_litre(3, 5), 4);
+}
+
+#[test]
+fn test_pour_one_litre_b() {
+    assert_eq!(pour_one_litre(7, 31), 20);
+}
+
+#[test]
+fn test_pour_one_litre_c() {
+    assert_eq!(pour_one_litre(1234, 4321), 2780);
+}
+
+#[test]
+fn test_pour_one_litre_d() {
+    assert_eq!(pour_one_litre(63, 33613), 13896);
+}
+
+#[test]
+fn test_pour_one_litre_e() {
     assert_eq!(pour_one_litre(485, 33613), 29948);
-    //assert_eq!(pour_one_litre(3, 5), 4);
-    //assert_eq!(pour_one_litre(7, 31), 20);
-    //assert_eq!(pour_one_litre(1234, 4321), 2780);
     // Slow example
     //assert_eq!(pour_one_litre(1964161, 1988017), 619928);
 }
