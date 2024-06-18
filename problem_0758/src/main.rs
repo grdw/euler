@@ -95,14 +95,13 @@ struct Strategy {
 
 fn pour_one_litre(s: u64, m: u64) -> u64 {
     let mut answer = u64::MAX;
+    let caps = [s, m, l];
     let l = s + m;
 
     let strats: Vec<Strategy> = vec![
         Strategy { steps: vec![Step::SLMS, Step::LM] },
         Strategy { steps: vec![Step::ML, Step::SMLS] }
     ];
-
-    let caps = [s, m, l];
 
     for strat in &strats {
         let mut buckets = [s, m, 0];
