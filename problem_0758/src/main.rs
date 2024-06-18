@@ -111,11 +111,10 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
 
         while buckets.iter().all(|n| *n != 1) {
             let step = &strat.steps[step_index];
-            println!("B: {:?} {} {:?}", buckets, strat_answer, step);
             match step {
                // In this case you keep on filling L till M is empty
                Step::SLMS => {
-                   let t_div = caps[1] / caps[0];
+                   let t_div = buckets[1] / caps[0];
                    let div = (caps[2] - buckets[2]) / caps[0];
                    let wl = buckets[2] + (caps[0] * div);
                    strat_answer += (t_div * 2) + 2;
@@ -127,11 +126,9 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
                },
                // In this case you keep on filling M till L is empty
                Step::SMLS => {
-                   let t_div = caps[1] / caps[0];
                    let div = buckets[2] / caps[0];
                    let wl = buckets[2] - (caps[0] * div);
-                   println!("{}", div);
-                   strat_answer += (t_div * 2) + 2;
+                   strat_answer += (div * 2) + 1;
 
                    buckets[0] = caps[2] - caps[1] - wl;
                    buckets[1] = caps[1];
@@ -149,8 +146,6 @@ fn pour_one_litre(s: u64, m: u64) -> u64 {
                     step_index = 1;
                 }
             }
-
-            println!("A: {:?} {}", buckets, strat_answer);
         }
 
         if strat_answer < answer {
@@ -237,12 +232,12 @@ fn test_pour_one_litre_a() {
 
 #[test]
 fn test_pour_one_litre_b() {
-    //let _a = pour_one_litre_bfs(7, 31);
     assert_eq!(pour_one_litre(7, 31), 20);
 }
 
 #[test]
 fn test_pour_one_litre_c() {
+    let _a = pour_one_litre_bfs(1234, 4321);
     assert_eq!(pour_one_litre(1234, 4321), 2780);
 }
 
@@ -254,6 +249,9 @@ fn test_pour_one_litre_d() {
 #[test]
 fn test_pour_one_litre_e() {
     assert_eq!(pour_one_litre(485, 33613), 29948);
-    // Slow example
-    //assert_eq!(pour_one_litre(1964161, 1988017), 619928);
+}
+
+#[test]
+fn test_pour_one_litre_f() {
+    assert_eq!(pour_one_litre(1964161, 1988017), 619928);
 }
