@@ -3,7 +3,7 @@ use std::collections::HashMap;
 const MOD: u128 = 1123455689;
 
 fn main() {
-    println!("Answer: {}", sum(18));
+    println!("Answer: {}", sum(18) % MOD);
 }
 
 fn fact(mut i: u32) -> u128 {
@@ -31,8 +31,8 @@ fn sum(length: usize) -> u128 {
         n[0] += 1;
 
         let mut c = 0;
-        for m in 0..length {
-            if n[m] > max && m + 1 < length {
+        for m in 0..length-1 {
+            if n[m] > max {
                 c = m + 1;
                 n[c] += 1;
             }
@@ -43,7 +43,7 @@ fn sum(length: usize) -> u128 {
         }
     }
 
-    return sum % MOD
+    return sum
 }
 
 fn value_for(v: &Vec<u8>, mut t: u128) -> u128 {
