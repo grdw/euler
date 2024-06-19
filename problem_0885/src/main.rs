@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+const MOD: u128 = 1123455689;
+
 fn main() {
     println!("Answer: {}", sum(18));
 }
@@ -14,27 +16,25 @@ fn fact(mut i: u32) -> u128 {
 }
 
 fn sum(length: usize) -> u128 {
-    let mut sum: u128 = 0;
     let total = fact(length as u32);
+    let max = 9;
 
+    let mut sum: u128 = 0;
     let mut n: Vec<u8> = vec![0; length];
     n[0] = 1;
 
-    let max = 9;
-    let mut start = true;
-
-    while start {
+    loop {
         sum += value_for(&n, total);
-        start = !n.iter().all(|&m| m == max);
+        if n.iter().all(|&m| m == max) {
+            break;
+        }
         n[0] += 1;
 
         let mut c = 0;
         for m in 0..length {
-            if n[m] > max {
-                if m + 1 < length {
-                    c = m + 1;
-                    n[m + 1] += 1;
-                }
+            if n[m] > max && m + 1 < length {
+                c = m + 1;
+                n[c] += 1;
             }
         }
 
@@ -43,7 +43,7 @@ fn sum(length: usize) -> u128 {
         }
     }
 
-    return sum
+    return sum % MOD
 }
 
 fn value_for(v: &Vec<u8>, mut t: u128) -> u128 {
