@@ -15,6 +15,15 @@ fn fact(mut i: u32) -> u128 {
     total
 }
 
+// Explanation on how this loop works
+// It's essentially the same as counting like:
+// [1, 0, 0]
+// [2, 0, 0]
+// ...
+// [9, 0, 0]
+// However, instead of jumping to [0, 1, 0]
+// It jumps to [1, 1, 0]
+// Similarly it jumps to [2, 2, 0] after [9, 1, 0]
 fn sum(length: usize) -> u128 {
     let total = fact(length as u32);
     let max = 9;
