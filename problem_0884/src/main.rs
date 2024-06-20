@@ -5,14 +5,13 @@ fn main() {
 fn detract_all(n: u128) -> u128 {
     let comb = all_cubes(n);
     let mut abacus = vec![0; comb.len()];
-    let index = 0;
     let mut steps = 0;
 
     loop {
-        abacus[index] += 1;
-
         let mut total = 0;
         let mut j = 0;
+        abacus[0] += 1;
+
         for m in 0..comb.len() {
             total += abacus[m] * comb[m];
             if m + 1 < comb.len() && total >= comb[m + 1] {
@@ -23,6 +22,7 @@ fn detract_all(n: u128) -> u128 {
         for m in 0..j {
             abacus[m] = 0;
         }
+
         if j > 0 {
             abacus[j] += 1;
         }
