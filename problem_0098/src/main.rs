@@ -73,7 +73,7 @@ impl Dictionary {
 
         let mut max = 0;
         for (_k, v) in h {
-            let n = self.find_square_value(&v, v[0].len());
+            let n = self.find_square_value(&v);
             if n > max {
                 max = n;
             }
@@ -82,8 +82,7 @@ impl Dictionary {
 		return max
 	}
 
-    fn find_square_value(&self, words: &Vec<String>, max: usize) -> u128 {
-        println!("{:?}", words);
+    fn find_square_value(&self, words: &Vec<String>) -> u128 {
         let config = to_config(&words[0]);
 
         let maps: Vec<Vec<usize>> = words.iter().map(|n|
@@ -92,6 +91,7 @@ impl Dictionary {
 
         let mut start = 1;
         let mut squares = vec![];
+        let max = words[0].len();
         loop {
             let square: u128 = start * start;
             let len = ((square as f64).log10() + 1.0) as usize;
@@ -130,7 +130,6 @@ impl Dictionary {
                         if *is > max {
                             max = *is
                         }
-                        println!("{}, {}", s, is);
                         break 'outer;
                     }
                 }
