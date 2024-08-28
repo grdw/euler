@@ -84,27 +84,14 @@ impl Dictionary {
 
     fn find_square_value(&self, words: &Vec<String>) -> u128 {
         let config = to_config(&words[0]);
-
         let maps: Vec<Vec<usize>> = words.iter().map(|n|
             n.bytes().map(|byte| config[&byte]).collect()
         ).collect();
 
-        let mut start = 1;
-        let mut squares = vec![];
-        let max = words[0].len();
-        loop {
-            let square: u128 = start * start;
-            let len = ((square as f64).log10() + 1.0) as usize;
-            if len == max {
-                squares.push(square);
-            } else if len > max {
-                break;
-            }
-            start += 1;
-        }
-
+        let squares = squares(words[0].len());
         let mut max = 0;
-        'outer: for s in &squares {
+
+        'outer: for (i, s) in squares.iter().enumerate() {
             let n = s.to_string();
             let c = to_config(&n);
 
@@ -114,22 +101,16 @@ impl Dictionary {
                 .collect();
 
             if list == maps[0] {
-                for is in &squares {
-                    let m = is.to_string();
+                for is in &squares[i..] {
                     let mut list = vec![];
-                    for k in m.bytes() {
+                    for k in is.to_string().bytes() {
                         if let Some(d) = c.get(&k) {
                             list.push(*d)
                         }
                     }
 
                     if list == maps[1] {
-                        if *s > max {
-                            max = *s;
-                        }
-                        if *is > max {
-                            max = *is
-                        }
+                        max = *is;
                         break 'outer;
                     }
                 }
@@ -139,13 +120,28 @@ impl Dictionary {
         return max
     }
 
-
     fn prime_factor(&self, word: &str) -> u128 {
             word
                 .bytes()
                 .map(|c| self.primes[(c - ASCII_OFFSET) as usize])
                 .product()
     }
+}
+
+fn squares(max: usize) -> Vec<u128> {
+    let mut squares = vec![];
+    let mut start = 1;
+    loop {
+        let square: u128 = start * start;
+        let len = ((square as f64).log10() + 1.0) as usize;
+        if len == max {
+            squares.push(square);
+        } else if len > max {
+            break;
+        }
+        start += 1;
+    }
+    return squares
 }
 
 fn to_config(word: &String) -> HashMap<u8, usize> {
