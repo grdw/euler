@@ -15,19 +15,18 @@ fn main() {
 
 fn highest_exp(list: &Vec<(f64, f64)>) -> usize {
     let mut sorted_list = list.clone();
-    sorted_list.sort_by(|(a, ae), (b, be)| compare_exps(*a, *ae, *b, *be));
+    sorted_list.sort_by(|(a, ae), (b, be)| {
+        if a.log10() * ae > b.log10() * be {
+            return Ordering::Less
+        } else {
+            return Ordering::Greater
+        }
+    });
+
     return 1 + list
         .iter()
         .position(|&o| o == sorted_list[0])
         .unwrap()
-}
-
-fn compare_exps(a: f64, ae: f64, b: f64, be: f64) -> Ordering {
-    if a.log10() * ae > b.log10() * be {
-        return Ordering::Less
-    } else {
-        return Ordering::Greater
-    }
 }
 
 #[test]
