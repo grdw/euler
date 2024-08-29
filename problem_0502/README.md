@@ -15,7 +15,11 @@ How many ways can I stack blocks on the second layer?
 # For 3 blocks:
 
 
-Imagine a 4 by 3
+Imagine a 4 by 4, the bottom is already placed
 [x x x x]
 [x x x x]
 [x x x x]
+
+Assume you can just put a block anywhere and pin it to the grid? How many ways can you this? Let's break the rule of '1 space' between each block, and the stacking rule.
+
+
