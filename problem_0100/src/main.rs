@@ -17,6 +17,11 @@ fn main() {
 // 2 * B * (B - 1) = D * (D - 1)
 // which means
 // 2B^2 - 2B = D^2 - D;
+// You can further transform this to
+// y^2 - 2x^2 = -1
+// This has a non-trivial solution of:
+// (x1,y1) = (1,3)
+// (xk+1,yk+1) = (3xk + 4yk, 2xk + 3yk)
 fn first_arrangement_over(n: u128) -> u128 {
     let mut prev_b = 15;
     let mut prev_d = 21;
