@@ -1,50 +1,49 @@
-fn totient(bound: usize) -> usize {
-    let mut n = 0;
-
-    for i in 1..bound {
-        if gcd(i, bound) == 1 {
-            n += 1
-        }
+fn euler_totient(mut n: usize) -> usize {
+    if n == 0 {
+        return 0;
     }
 
-    n
+    let mut result = n;
+    // p is a prime factor
+    let mut p = 2;
+
+    while p * p <= n {
+        if n % p == 0 {
+            while n % p == 0 {
+                n /= p;
+            }
+            result -= result / p;
+        }
+        p += 1;
+    }
+
+    if n > 1 {
+        result -= result / n;
+    }
+
+    result
 }
 
 #[test]
-fn test_totient() {
-    assert_eq!(totient(2), 1);
-    assert_eq!(totient(3), 2);
-    assert_eq!(totient(4), 2);
-    assert_eq!(totient(5), 4);
-    assert_eq!(totient(6), 2);
-    assert_eq!(totient(7), 6);
-    assert_eq!(totient(8), 4);
-    assert_eq!(totient(9), 6);
-}
-
-fn gcd(mut a: usize, mut b: usize) -> usize {
-    while b != 0 {
-        let temp = b;
-        b = a % b;
-        a = temp;
-    }
-    a
+fn test_euler_totient() {
+    assert_eq!(euler_totient(5), 4);
 }
 
 fn max_totient(bound: usize) -> usize {
-    let mut max = 0;
+    let mut highest_pick: usize = 0;
+    let mut max_totient: f32 = 0.0;
 
-    for n in 1..=bound {
-        let t = totient(n);
-        if n % 10_000 == 0 {
-            println!("---- {}", n);
-        }
-        if t > max {
-            max = t;
+    for n in 2..=bound {
+        let mut totient = euler_totient(n);
+        let div = (n as f32) / (totient as f32);
+
+        if div > max_totient {
+            max_totient = div;
+            highest_pick = n;
         }
     }
 
-    max
+    highest_pick
 }
 
 #[test]
